@@ -18,5 +18,10 @@
   ],
   "dependencies": {
     "playwright-core": "^1.35.1"
+  },
+  "scripts": {
+    "repl": "npx ts-node",
+    "build": "npx tsc ./src/index.ts",
+    "start": "npx ts-node ./src/index.ts"
   }
 }
