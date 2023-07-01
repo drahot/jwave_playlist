@@ -15,5 +15,8 @@
   },
   "eslintIgnore": [
     "./.eslintrc.js"
-  ]
+  ],
+  "dependencies": {
+    "playwright-core": "^1.35.1"
+  }
 }
