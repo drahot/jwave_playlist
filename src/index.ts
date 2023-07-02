@@ -5,7 +5,7 @@ const main = async () => {
   const browser = await chromium.launch({
     channel: 'chrome',
     headless: true,
-    slowMo: 1000,
+    slowMo: 500,
   })
   const page = await browser.newPage()
   await page.goto('https://www.j-wave.co.jp/songlist/')
