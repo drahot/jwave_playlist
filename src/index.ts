@@ -13,7 +13,6 @@ const main = async () => {
     const songInfos = document.querySelectorAll(
       '.list_songs > .song > .song_wrap > .song_inner > .col_l > .song_info'
     )
-
     return Array.from(songInfos.values()).map((songInfo) => {
       const songName = songInfo.querySelector('h4')?.textContent ?? ''
       const artistName =
