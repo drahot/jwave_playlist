@@ -1,7 +1,27 @@
 {
   "devDependencies": {
     "@types/node": "^20.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.60.1",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-standard-with-typescript": "^36.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "typescript": "*"
+  },
+  "eslintIgnore": [
+    "./.eslintrc.js"
+  ],
+  "dependencies": {
+    "playwright-core": "^1.35.1"
+  },
+  "scripts": {
+    "repl": "npx ts-node",
+    "build": "esbuild ./src/index.ts --outfile=./dist/index.js --bundle --minify --platform=node --target=node18",
+    "start": "node ./dist/index.js"
   }
 }
