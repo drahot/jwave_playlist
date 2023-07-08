@@ -1,5 +1,7 @@
 import { chromium } from 'playwright-core'
 
+const jWaveOnAirUrl = 'https://www.j-wave.co.jp/songlist/'
+
 interface Song {
   songName: string
   artistName: string
@@ -12,7 +14,7 @@ export const getOnAirList = async (): Promise<Song[]> => {
     slowMo: 500,
   })
   const page = await browser.newPage()
-  await page.goto('https://www.j-wave.co.jp/songlist/')
+  await page.goto(jWaveOnAirUrl)
   try {
     return await page.evaluate(() => {
       const songInfos = document.querySelectorAll(
