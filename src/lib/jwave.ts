@@ -2,7 +2,7 @@ import { chromium } from 'playwright-core'
 
 const jWaveOnAirUrl = 'https://www.j-wave.co.jp/songlist/'
 
-interface Song {
+type Song = {
   songName: string
   artistName: string
 }
