@@ -9,7 +9,15 @@ const main = async () => {
     return
   }
 
+  if (!authResult.auth) {
+    console.log('authResult.auth is undefined')
+    return
+  }
+
   const auth = authResult.auth
+  console.log(auth.access_token)
+  console.log(auth.token_type)
+  console.log(auth.expires_in)
 
   console.log(list)
 }
