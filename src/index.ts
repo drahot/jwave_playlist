@@ -2,8 +2,8 @@ import { getOnAirList } from './lib/jwave'
 import { authenticate } from './lib/spotify_auth'
 
 const main = async () => {
-  const list = await getOnAirList()
   const authResult = await authenticate()
+
   if (authResult.error) {
     console.log(authResult.error)
     return
@@ -18,6 +18,8 @@ const main = async () => {
   console.log(auth.access_token)
   console.log(auth.token_type)
   console.log(auth.expires_in)
+
+  const list = await getOnAirList()
 
   console.log(list)
 }
