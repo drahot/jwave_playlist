@@ -3,7 +3,7 @@ import api from '../../spotify_auth/$api'
 import aspida from '@aspida/axios'
 import { AuthResult } from '../../spotify_auth'
 
-type AuthData =
+type Result<AuthResult> =
   | {
       auth: AuthResult
       error: undefined
@@ -14,7 +14,7 @@ type AuthData =
     }
 env.config()
 
-const authenticate = async (): Promise<AuthData> => {
+export const authenticate = async (): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
     return { auth: undefined, error: 'SPOTIFY_CLIENT_ID is not set' }
   }
