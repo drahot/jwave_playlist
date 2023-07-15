@@ -5,12 +5,12 @@ const main = async () => {
   const authResult = await authenticate()
 
   if (authResult.error) {
-    console.log(authResult.error)
+    console.error(authResult.error.message)
     return
   }
 
   if (!authResult.auth) {
-    console.log('authResult.auth is undefined')
+    console.error('authResult.auth is undefined')
     return
   }
 
