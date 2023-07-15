@@ -10,18 +10,18 @@ type Result<AuthResult> =
     }
   | {
       auth: undefined
-      error: string
+      error: Error
     }
 env.config()
 
 export const authenticate = async (): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
-    return { auth: undefined, error: 'SPOTIFY_CLIENT_ID is not set' }
+    return { auth: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
   }
   if (!process.env.SPOTIFY_CLIENT_SECRET) {
     return {
       auth: undefined,
-      error: 'SPOTIFY_CLIENT_SECRET is not set',
+      error: new Error('SPOTIFY_CLIENT_SECRET is not set'),
     }
   }
 
@@ -37,7 +37,7 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
     },
   })
   if (status !== 200) {
-    return { auth: undefined, error: 'auth error' }
+    return { auth: undefined, error: new Error('auth error') }
   }
   return { auth: body, error: undefined }
 }

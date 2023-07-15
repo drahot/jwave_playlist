@@ -5,5 +5,5 @@ export type Result<T> =
     }
   | {
       auth: undefined
-      error: string
+      error: Error
     }
