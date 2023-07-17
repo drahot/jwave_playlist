@@ -1,9 +1,9 @@
 export type Result<T> =
   | {
-      auth: T
+      data: T
       error: undefined
     }
   | {
-      auth: undefined
+      data: undefined
       error: Error
     }

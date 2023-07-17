@@ -2,25 +2,17 @@ import env from 'dotenv'
 import api from '../../spotify_auth/$api'
 import aspida from '@aspida/axios'
 import { AuthResult } from '../../spotify_auth'
+import { Result } from './result'
 
-type Result<AuthResult> =
-  | {
-      auth: AuthResult
-      error: undefined
-    }
-  | {
-      auth: undefined
-      error: Error
-    }
 env.config()
 
 export const authenticate = async (): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
-    return { auth: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
+    return { data: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
   }
   if (!process.env.SPOTIFY_CLIENT_SECRET) {
     return {
-      auth: undefined,
+      data: undefined,
       error: new Error('SPOTIFY_CLIENT_SECRET is not set'),
     }
   }
@@ -37,7 +29,7 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
     },
   })
   if (status !== 200) {
-    return { auth: undefined, error: new Error('auth error') }
+    return { data: undefined, error: new Error('auth error') }
   }
-  return { auth: body, error: undefined }
+  return { data: body, error: undefined }
 }
