@@ -23,19 +23,19 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
 
   const client = api(aspida())
-  // try {
-  const { body, status } = await client.token.post({
-    body: {
-      client_id: clientId,
-      client_secret: clientSecret,
-      grant_type: 'client_credentials',
-    },
-  })
-  if (status !== 200) {
-    return { data: undefined, error: new Error('auth error') }
+  try {
+    const { body, status } = await client.token.post({
+      body: {
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: 'client_credentials',
+      },
+    })
+    if (status !== 200) {
+      return { data: undefined, error: new Error('auth error') }
+    }
+    return { data: body, error: undefined }
+  } catch (error: unknown) {
+    return { data: undefined, error: error as Error }
   }
-  return { data: body, error: undefined }
-  // } catch (error: unknown) {
-  //   return { data: undefined, error: error as Error }
-  // }
 }
