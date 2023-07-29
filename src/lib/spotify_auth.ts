@@ -1,7 +1,9 @@
+// noinspection JSUnresolvedReference
+
 import env from 'dotenv'
 import api from '../../spotify_auth/$api'
 import aspida from '@aspida/axios'
-import { AuthResult } from '../../spotify_auth'
+import { AuthResult } from '../../spotify_auth/token'
 import { Result } from './result'
 
 env.config()
@@ -21,7 +23,8 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
 
   const client = api(aspida())
-  const { body, status } = await client.post({
+  // try {
+  const { body, status } = await client.token.post({
     body: {
       client_id: clientId,
       client_secret: clientSecret,
@@ -32,4 +35,7 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
     return { data: undefined, error: new Error('auth error') }
   }
   return { data: body, error: undefined }
+  // } catch (error: unknown) {
+  //   return { data: undefined, error: error as Error }
+  // }
 }

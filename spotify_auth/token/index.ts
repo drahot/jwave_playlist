@@ -6,6 +6,7 @@ export type AuthResult = {
 
 export type Methods = {
   post: {
+    reqFormat: URLSearchParams
     reqBody: {
       client_id: string
       client_secret: string
