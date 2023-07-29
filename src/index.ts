@@ -10,12 +10,12 @@ const main = async () => {
     process.exit(1)
   }
 
-  if (!authResult.auth) {
+  if (!authResult.data) {
     console.error('authResult.auth is undefined')
     process.exit(1)
   }
 
-  const auth = authResult.auth
+  const auth = authResult.data
   console.log(auth.access_token)
   console.log(auth.token_type)
   console.log(auth.expires_in)
