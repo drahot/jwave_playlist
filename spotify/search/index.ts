@@ -10,7 +10,7 @@ export type Methods = {
   get: {
     query: Types.QueryMarket & {
       q: string
-      type: ('album' | 'artist' | 'playlist' | 'track' | 'show' | 'episode' | 'audiobook')[]
+      type: string
       limit?: number | undefined
       offset?: number | undefined
       include_external?: 'audio' | undefined
