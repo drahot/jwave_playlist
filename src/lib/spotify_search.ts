@@ -1,5 +1,7 @@
 import aspida from '@aspida/axios'
 import api from '../../spotify/search/$api'
+import { TrackObject } from '../../spotify/@types'
+import { Result } from './result'
 
 type SearchParams = {
   accessToken: string
@@ -7,7 +9,11 @@ type SearchParams = {
   song: string
 }
 
-export const search = async ({ accessToken, artist, song }: SearchParams) => {
+export const search = async ({
+  accessToken,
+  artist,
+  song,
+}: SearchParams): Promise<Result<TrackObject[]>> => {
   const client = api(aspida())
 
   const query = `remaster track:${song} artist:${artist}`.replace(/ /g, '%20')
