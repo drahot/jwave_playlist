@@ -9,7 +9,7 @@ type SearchParams = {
   song: string
 }
 
-export const search = async ({
+export const searchTrack = async ({
   accessToken,
   artist,
   song,

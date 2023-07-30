@@ -1,6 +1,7 @@
 import { authenticate } from './lib/spotify_auth'
 import * as process from 'process'
-import { search } from './lib/spotify_search'
+import { getOnAirList } from './lib/jwave'
+import { searchTrack } from './lib/spotify_search'
 
 const main = async () => {
   const authResult = await authenticate()
@@ -20,23 +21,28 @@ const main = async () => {
   console.log(auth.token_type)
   console.log(auth.expires_in)
 
-  const searchResult = await search({
-    accessToken: auth?.access_token,
-    artist: 'Bruno Majar',
-    song: 'Tell her',
-  })
+  const list = await getOnAirList()
 
-  if (searchResult.error) {
-    console.error(searchResult.error.message)
-    process.exit(1)
-  }
+  for (const item of list) {
+    const searchResult = await searchTrack({
+      accessToken: auth?.access_token,
+      artist: item.artistName,
+      song: item.songName,
+    })
 
-  if (searchResult.data) {
-    if (searchResult.data.length) {
-      const track = searchResult.data[0]
-      console.log(track.artists?.[0].name ?? '')
-      console.log(track.name)
-      console.log(track.external_urls?.spotify)
+    if (searchResult.error) {
+      console.error(searchResult.error.message)
+      process.exit(1)
+    }
+
+    if (searchResult.data) {
+      if (searchResult.data.length) {
+        const track = searchResult.data[0]
+        console.log(track.artists?.[0].name ?? '')
+        console.log(track.name)
+        console.log(track.external_urls?.spotify)
+        console.log()
+      }
     }
   }
 
