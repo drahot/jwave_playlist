@@ -32,14 +32,14 @@ const main = async () => {
   }
 
   if (searchResult.data) {
-    searchResult.data.tracks.items?.forEach((item) => {
-      console.log(item.artists)
-      console.log(item.name)
-      item.external_urls?.spotify && console.log(item.external_urls.spotify)
-    })
+    if (searchResult.data.length) {
+      const track = searchResult.data[0]
+      console.log(track.artists?.[0].name ?? '')
+      console.log(track.name)
+      console.log(track.external_urls?.spotify)
+    }
   }
-  //
-  // console.log(list)
+
   process.exit()
 }
 
