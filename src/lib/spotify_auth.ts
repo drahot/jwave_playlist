@@ -18,6 +18,12 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
       error: new Error('SPOTIFY_CLIENT_SECRET is not set'),
     }
   }
+  if (!process.env.SPOTIFY_USER_ID) {
+    return {
+      data: undefined,
+      error: new Error('SPOTIFY_USER_ID is not set'),
+    }
+  }
 
   const clientId = process.env.SPOTIFY_CLIENT_ID
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
