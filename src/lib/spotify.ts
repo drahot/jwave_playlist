@@ -1,9 +1,15 @@
+// noinspection JSUnresolvedReference
+
 import aspida from '@aspida/axios'
 import * as searchApi from '../../spotify/search/$api'
+import * as usersApi from '../../spotify/users/$api'
+
 import { TrackObject } from '../../spotify/@types'
 import { Result } from './result'
 
 export const spotify = (accessToken: string) => {
+  const userId = process.env.SPOITFY_USER_ID ?? ''
+
   return {
     // トラックを検索する
     searchTrack: async (
@@ -51,6 +57,33 @@ export const spotify = (accessToken: string) => {
         }) ?? []
 
       return { data: tracks, error: undefined }
+    },
+    // プレイリストを作成する
+    createPlaylist: async (
+      name: string,
+      description?: string,
+      isPublic = false
+    ) => {
+      const client = usersApi.default(aspida())
+      const data = await client._user_id(userId).playlists.post({
+        body: { name, description, public: isPublic },
+        config: {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      })
+
+      const { body, status } = data
+
+      if (status !== 201) {
+        return {
+          data: undefined,
+          error: new Error(`create playlist error: statusCode=${status}`),
+        }
+      }
+
+      return { data: body, error: undefined }
     },
   }
 }
