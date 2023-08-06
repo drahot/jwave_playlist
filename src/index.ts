@@ -1,7 +1,7 @@
 import { authenticate } from './lib/spotify_auth'
 import * as process from 'process'
 import { getOnAirList } from './lib/jwave'
-import { searchTrack } from './lib/spotify_search'
+import { spotify } from './lib/spotify'
 
 const main = async () => {
   const authResult = await authenticate()
@@ -23,12 +23,12 @@ const main = async () => {
 
   const list = await getOnAirList()
 
+  const client = spotify(auth.access_token)
   for (const item of list) {
-    const searchResult = await searchTrack({
-      accessToken: auth?.access_token,
-      artist: item.artistName,
-      song: item.songName,
-    })
+    const searchResult = await client.searchTrack(
+      item.artistName,
+      item.songName
+    )
 
     if (searchResult.error) {
       console.error(searchResult.error.message)
