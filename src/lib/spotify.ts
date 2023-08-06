@@ -7,9 +7,9 @@ import * as usersApi from '../../spotify/users/$api'
 import { TrackObject } from '../../spotify/@types'
 import { Result } from './result'
 
-export const spotify = (accessToken: string) => {
-  const userId = process.env.SPOITFY_USER_ID ?? ''
+const userId = process.env.SPOITFY_USER_ID ?? ''
 
+export const spotify = (accessToken: string) => {
   return {
     // トラックを検索する
     searchTrack: async (
