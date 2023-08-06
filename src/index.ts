@@ -1,7 +1,73 @@
 import { authenticate } from './lib/spotify_auth'
 import * as process from 'process'
-import { getOnAirList } from './lib/jwave'
-import { searchTrack } from './lib/spotify_search'
+import { getOnAirList, Song } from './lib/jwave'
+import { spotify } from './lib/spotify'
+import dayjs from 'dayjs'
+
+type spotifyResult = ReturnType<typeof spotify>
+
+const searchTracks = async (client: spotifyResult, songs: Song[]) => {
+  const tracks = songs
+    .map(async (item, i) => {
+      if (i !== 0 && i % 20 === 0) {
+        await sleep(1000)
+      }
+      const searchResult = await client.searchTrack(
+        item.artistName,
+        item.songName
+      )
+      if (searchResult.error) {
+        console.error(searchResult.error.message)
+        return ''
+      }
+      if (!searchResult.data) {
+        return ''
+      }
+
+      const track = searchResult.data[0]
+      if (!track) {
+        return ''
+      }
+      console.debug(track.artists?.[0].name ?? '')
+      console.debug(track.name)
+      console.debug(track.external_urls?.spotify)
+      console.debug(track.uri)
+
+      return track.uri ?? ''
+    })
+    .filter(async (item) => ((await item) ?? '') !== '')
+  return Promise.all(tracks)
+}
+
+const chunkArray = <T>(array: T[], size: number): T[][] => {
+  const chunks: T[][] = []
+
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size))
+  }
+  return chunks
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const createPlaylist = async (client: spotifyResult, trackUris: string[]) => {
+  const today = dayjs().format('YYYY年MM月DD')
+  const jWavePlaylistName = `J-WAVE On Air ${today}`
+
+  const createResult = await client.createPlaylist(jWavePlaylistName)
+  if (createResult.error) {
+    console.error(createResult.error.message)
+    return
+  }
+
+  const playlist = createResult.data
+
+  for (const trackUris1 of chunkArray(trackUris, 100)) {
+    await client.addItemsToPlaylist(playlist.id ?? '', trackUris1)
+    await sleep(1000)
+  }
+  return playlist
+}
 
 const main = async () => {
   const authResult = await authenticate()
@@ -17,35 +83,14 @@ const main = async () => {
   }
 
   const auth = authResult.data
-  console.log(auth.access_token)
-  console.log(auth.token_type)
-  console.log(auth.expires_in)
+  const client = spotify(auth.access_token)
 
-  const list = await getOnAirList()
+  const songs = await getOnAirList()
 
-  for (const item of list) {
-    const searchResult = await searchTrack({
-      accessToken: auth?.access_token,
-      artist: item.artistName,
-      song: item.songName,
-    })
-
-    if (searchResult.error) {
-      console.error(searchResult.error.message)
-      process.exit(1)
-    }
-
-    if (searchResult.data) {
-      if (searchResult.data.length) {
-        const track = searchResult.data[0]
-        console.log(track.artists?.[0].name ?? '')
-        console.log(track.name)
-        console.log(track.external_urls?.spotify)
-        console.log()
-      }
-    }
-  }
-
+  const trackUris = await searchTracks(client, songs.slice(50))
+  console.log(trackUris.length)
+  const playlist = await createPlaylist(client, trackUris)
+  console.log(playlist?.external_urls?.spotify)
   process.exit()
 }
 
