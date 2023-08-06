@@ -1,7 +1,59 @@
 import { authenticate } from './lib/spotify_auth'
 import * as process from 'process'
-import { getOnAirList } from './lib/jwave'
+import { getOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
+import dayjs from 'dayjs'
+
+type spotifyResult = ReturnType<typeof spotify>
+
+const searchTracks = async (client: spotifyResult, songs: Song[]) => {
+  const tracks = songs
+    .map(async (item) => {
+      const searchResult = await client.searchTrack(
+        item.artistName,
+        item.songName
+      )
+      if (searchResult.error) {
+        console.error(searchResult.error.message)
+        return ''
+      }
+      if (!searchResult.data) {
+        return ''
+      }
+
+      const track = searchResult.data[0]
+      console.debug(track.artists?.[0].name ?? '')
+      console.debug(track.name)
+      console.debug(track.external_urls?.spotify)
+      console.debug(track.uri)
+      return track.uri ?? ''
+    })
+    .filter(async (item) => ((await item) ?? '') !== '')
+  return Promise.all(tracks)
+}
+
+const createPlaylist = async (client: spotifyResult, trackUris: string[]) => {
+  const today = dayjs().format('YYYY年MM月DD')
+  const jWavePlaylistName = `J-WAVE On Air ${today}`
+
+  const createResult = await client.createPlaylist(jWavePlaylistName)
+  if (createResult.error) {
+    console.error(createResult.error.message)
+    return
+  }
+
+  const playlist = createResult.data
+
+  const addItemResult = await client.addItemsToPlaylist(
+    playlist.id ?? '',
+    trackUris
+  )
+  if (addItemResult.error) {
+    console.error(addItemResult.error.message)
+    return
+  }
+  console.log(addItemResult.data)
+}
 
 const main = async () => {
   const authResult = await authenticate()
@@ -17,35 +69,11 @@ const main = async () => {
   }
 
   const auth = authResult.data
-  console.log(auth.access_token)
-  console.log(auth.token_type)
-  console.log(auth.expires_in)
+  const client = spotify(auth.access_token)
 
   const list = await getOnAirList()
-
-  const client = spotify(auth.access_token)
-  for (const item of list) {
-    const searchResult = await client.searchTrack(
-      item.artistName,
-      item.songName
-    )
-
-    if (searchResult.error) {
-      console.error(searchResult.error.message)
-      process.exit(1)
-    }
-
-    if (searchResult.data) {
-      if (searchResult.data.length) {
-        const track = searchResult.data[0]
-        console.log(track.artists?.[0].name ?? '')
-        console.log(track.name)
-        console.log(track.external_urls?.spotify)
-        console.log()
-      }
-    }
-  }
-
+  const trackUris = await searchTracks(client, list)
+  await createPlaylist(client, trackUris)
   process.exit()
 }
 

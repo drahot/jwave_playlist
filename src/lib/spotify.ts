@@ -3,6 +3,7 @@
 import aspida from '@aspida/axios'
 import * as searchApi from '../../spotify/search/$api'
 import * as usersApi from '../../spotify/users/$api'
+import * as playlistsApi from '../../spotify/playlists/$api'
 
 import { TrackObject } from '../../spotify/@types'
 import { Result } from './result'
@@ -80,6 +81,29 @@ export const spotify = (accessToken: string) => {
         return {
           data: undefined,
           error: new Error(`create playlist error: statusCode=${status}`),
+        }
+      }
+
+      return { data: body, error: undefined }
+    },
+    //
+    addItemsToPlaylist: async (playlistId: string, trackUris: string[]) => {
+      const client = playlistsApi.default(aspida())
+      const data = await client._playlist_id(playlistId).tracks.post({
+        body: { position: 0, uris: trackUris },
+        config: {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      })
+
+      const { body, status } = data
+
+      if (status !== 201) {
+        return {
+          data: undefined,
+          error: new Error(`add playlist error: statusCode=${status}`),
         }
       }
 
