@@ -8,7 +8,7 @@ import * as playlistsApi from '../../spotify/playlists/$api'
 import { TrackObject } from '../../spotify/@types'
 import { Result } from './result'
 
-const userId = process.env.SPOITFY_USER_ID ?? ''
+const userId = process.env.SPOTIFY_USER_ID ?? ''
 
 export const spotify = (accessToken: string) => {
   return {
@@ -24,7 +24,7 @@ export const spotify = (accessToken: string) => {
         '%20'
       )
       const data = await client.get({
-        query: { q: query, type: 'track', limit: 20 },
+        query: { q: query, type: 'track', limit: 50 },
         config: {
           headers: {
             Authorization: `Bearer ${accessToken}`,

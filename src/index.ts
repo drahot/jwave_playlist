@@ -8,7 +8,10 @@ type spotifyResult = ReturnType<typeof spotify>
 
 const searchTracks = async (client: spotifyResult, songs: Song[]) => {
   const tracks = songs
-    .map(async (item) => {
+    .map(async (item, i) => {
+      if (i !== 0 && i % 20 === 0) {
+        await sleep(1000)
+      }
       const searchResult = await client.searchTrack(
         item.artistName,
         item.songName
@@ -22,15 +25,30 @@ const searchTracks = async (client: spotifyResult, songs: Song[]) => {
       }
 
       const track = searchResult.data[0]
+      if (!track) {
+        return ''
+      }
       console.debug(track.artists?.[0].name ?? '')
       console.debug(track.name)
       console.debug(track.external_urls?.spotify)
       console.debug(track.uri)
+
       return track.uri ?? ''
     })
     .filter(async (item) => ((await item) ?? '') !== '')
   return Promise.all(tracks)
 }
+
+const chunkArray = <T>(array: T[], size: number): T[][] => {
+  const chunks: T[][] = []
+
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size))
+  }
+  return chunks
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const createPlaylist = async (client: spotifyResult, trackUris: string[]) => {
   const today = dayjs().format('YYYY年MM月DD')
@@ -44,15 +62,11 @@ const createPlaylist = async (client: spotifyResult, trackUris: string[]) => {
 
   const playlist = createResult.data
 
-  const addItemResult = await client.addItemsToPlaylist(
-    playlist.id ?? '',
-    trackUris
-  )
-  if (addItemResult.error) {
-    console.error(addItemResult.error.message)
-    return
+  for (const trackUris1 of chunkArray(trackUris, 100)) {
+    await client.addItemsToPlaylist(playlist.id ?? '', trackUris1)
+    await sleep(1000)
   }
-  console.log(addItemResult.data)
+  return playlist
 }
 
 const main = async () => {
@@ -71,9 +85,12 @@ const main = async () => {
   const auth = authResult.data
   const client = spotify(auth.access_token)
 
-  const list = await getOnAirList()
-  const trackUris = await searchTracks(client, list)
-  await createPlaylist(client, trackUris)
+  const songs = await getOnAirList()
+
+  const trackUris = await searchTracks(client, songs.slice(50))
+  console.log(trackUris.length)
+  const playlist = await createPlaylist(client, trackUris)
+  console.log(playlist?.external_urls?.spotify)
   process.exit()
 }
 
