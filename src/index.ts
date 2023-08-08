@@ -4,9 +4,9 @@ import { getOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 
-type spotifyResult = ReturnType<typeof spotify>
+type spotifyClient = ReturnType<typeof spotify>
 
-const searchTracks = async (client: spotifyResult, songs: Song[]) => {
+const searchTracks = async (client: spotifyClient, songs: Song[]) => {
   const tracks = songs
     .map(async (item, i) => {
       if (i !== 0 && i % 20 === 0) {
@@ -50,8 +50,8 @@ const chunkArray = <T>(array: T[], size: number): T[][] => {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const createPlaylist = async (client: spotifyResult, trackUris: string[]) => {
-  const today = dayjs().format('YYYY年MM月DD')
+const createPlaylist = async (client: spotifyClient, trackUris: string[]) => {
+  const today = dayjs().format('YYYY-MM-DD')
   const jWavePlaylistName = `J-WAVE On Air ${today}`
 
   const createResult = await client.createPlaylist(jWavePlaylistName)
@@ -62,8 +62,8 @@ const createPlaylist = async (client: spotifyResult, trackUris: string[]) => {
 
   const playlist = createResult.data
 
-  for (const trackUris1 of chunkArray(trackUris, 100)) {
-    await client.addItemsToPlaylist(playlist.id ?? '', trackUris1)
+  for (const uris of chunkArray(trackUris, 100)) {
+    await client.addItemsToPlaylist(playlist.id ?? '', uris)
     await sleep(1000)
   }
   return playlist
@@ -83,11 +83,14 @@ const main = async () => {
   }
 
   const auth = authResult.data
+  console.log('auth_token: ', auth.access_token)
+  console.log('expires_in: ', auth?.expires_in)
+
   const client = spotify(auth.access_token)
 
   const songs = await getOnAirList()
 
-  const trackUris = await searchTracks(client, songs.slice(50))
+  const trackUris = await searchTracks(client, songs.slice(0, 50))
   console.log(trackUris.length)
   const playlist = await createPlaylist(client, trackUris)
   console.log(playlist?.external_urls?.spotify)

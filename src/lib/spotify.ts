@@ -4,9 +4,11 @@ import aspida from '@aspida/axios'
 import * as searchApi from '../../spotify/search/$api'
 import * as usersApi from '../../spotify/users/$api'
 import * as playlistsApi from '../../spotify/playlists/$api'
+import * as meApi from '../../spotify/me/$api'
 
 import { TrackObject } from '../../spotify/@types'
 import { Result } from './result'
+import * as process from 'process'
 
 const userId = process.env.SPOTIFY_USER_ID ?? ''
 
@@ -65,26 +67,30 @@ export const spotify = (accessToken: string) => {
       description?: string,
       isPublic = false
     ) => {
-      const client = usersApi.default(aspida())
-      const data = await client._user_id(userId).playlists.post({
-        body: { name, description, public: isPublic },
-        config: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      try {
+        const client = usersApi.default(aspida())
+        const data = await client._user_id(userId).playlists.post({
+          body: { name, description: description ?? '', public: isPublic },
+          config: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        },
-      })
+        })
+        const { body, status } = data
 
-      const { body, status } = data
-
-      if (status !== 201) {
-        return {
-          data: undefined,
-          error: new Error(`create playlist error: statusCode=${status}`),
+        if (status !== 201) {
+          return {
+            data: undefined,
+            error: new Error(`create playlist error: statusCode=${status}`),
+          }
         }
-      }
 
-      return { data: body, error: undefined }
+        return { data: body, error: undefined }
+      } catch (e) {
+        const error = e as Error
+        return { data: undefined, error: error }
+      }
     },
     //
     addItemsToPlaylist: async (playlistId: string, trackUris: string[]) => {
@@ -101,6 +107,26 @@ export const spotify = (accessToken: string) => {
       const { body, status } = data
 
       if (status !== 201) {
+        return {
+          data: undefined,
+          error: new Error(`add playlist error: statusCode=${status}`),
+        }
+      }
+
+      return { data: body, error: undefined }
+    },
+    me: async () => {
+      const client = meApi.default(aspida())
+      const data = await client.get({
+        config: {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      })
+      const { body, status } = data
+
+      if (status !== 200) {
         return {
           data: undefined,
           error: new Error(`add playlist error: statusCode=${status}`),
