@@ -30,7 +30,7 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
 
   const client = api(aspida())
   try {
-    const { body, status } = await client.token.post({
+    const { body, status } = await client.api.token.post({
       body: {
         client_id: clientId,
         client_secret: clientSecret,
