@@ -7,6 +7,6 @@ export type Methods = {
     query?: Types.QueryMarket & Types.QueryAdditionalTypes | undefined
     status: 200
     /** Information about the currently playing track */
-    resBody: Types.CurrentlyPlayingContextObject
+    resBody: Types.CurrentlyPlayingObject
   }
 }

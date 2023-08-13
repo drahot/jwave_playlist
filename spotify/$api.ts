@@ -49,24 +49,25 @@ import type { Methods as Methods45 } from './me/player/volume'
 import type { Methods as Methods46 } from './me/playlists'
 import type { Methods as Methods47 } from './me/shows'
 import type { Methods as Methods48 } from './me/shows/contains'
-import type { Methods as Methods49 } from './me/top/_type'
-import type { Methods as Methods50 } from './me/tracks'
-import type { Methods as Methods51 } from './me/tracks/contains'
-import type { Methods as Methods52 } from './playlists/_playlist_id@string'
-import type { Methods as Methods53 } from './playlists/_playlist_id@string/followers'
-import type { Methods as Methods54 } from './playlists/_playlist_id@string/followers/contains'
-import type { Methods as Methods55 } from './playlists/_playlist_id@string/images'
-import type { Methods as Methods56 } from './playlists/_playlist_id@string/tracks'
-import type { Methods as Methods57 } from './recommendations'
-import type { Methods as Methods58 } from './recommendations/available-genre-seeds'
-import type { Methods as Methods59 } from './search'
-import type { Methods as Methods60 } from './shows'
-import type { Methods as Methods61 } from './shows/_id@string'
-import type { Methods as Methods62 } from './shows/_id@string/episodes'
-import type { Methods as Methods63 } from './tracks'
-import type { Methods as Methods64 } from './tracks/_id@string'
-import type { Methods as Methods65 } from './users/_user_id@string'
-import type { Methods as Methods66 } from './users/_user_id@string/playlists'
+import type { Methods as Methods49 } from './me/top/artists'
+import type { Methods as Methods50 } from './me/top/tracks'
+import type { Methods as Methods51 } from './me/tracks'
+import type { Methods as Methods52 } from './me/tracks/contains'
+import type { Methods as Methods53 } from './playlists/_playlist_id@string'
+import type { Methods as Methods54 } from './playlists/_playlist_id@string/followers'
+import type { Methods as Methods55 } from './playlists/_playlist_id@string/followers/contains'
+import type { Methods as Methods56 } from './playlists/_playlist_id@string/images'
+import type { Methods as Methods57 } from './playlists/_playlist_id@string/tracks'
+import type { Methods as Methods58 } from './recommendations'
+import type { Methods as Methods59 } from './recommendations/available-genre-seeds'
+import type { Methods as Methods60 } from './search'
+import type { Methods as Methods61 } from './shows'
+import type { Methods as Methods62 } from './shows/_id@string'
+import type { Methods as Methods63 } from './shows/_id@string/episodes'
+import type { Methods as Methods64 } from './tracks'
+import type { Methods as Methods65 } from './tracks/_id@string'
+import type { Methods as Methods66 } from './users/_user_id@string'
+import type { Methods as Methods67 } from './users/_user_id@string/playlists'
 
 const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
   const prefix = (baseURL === undefined ? 'https://api.spotify.com/v1' : baseURL).replace(/\/$/, '')
@@ -110,17 +111,18 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
   const PATH37 = '/me/playlists'
   const PATH38 = '/me/shows'
   const PATH39 = '/me/shows/contains'
-  const PATH40 = '/me/top'
-  const PATH41 = '/me/tracks'
-  const PATH42 = '/me/tracks/contains'
-  const PATH43 = '/followers'
-  const PATH44 = '/followers/contains'
-  const PATH45 = '/images'
-  const PATH46 = '/recommendations'
-  const PATH47 = '/recommendations/available-genre-seeds'
-  const PATH48 = '/search'
-  const PATH49 = '/shows'
-  const PATH50 = '/users'
+  const PATH40 = '/me/top/artists'
+  const PATH41 = '/me/top/tracks'
+  const PATH42 = '/me/tracks'
+  const PATH43 = '/me/tracks/contains'
+  const PATH44 = '/followers'
+  const PATH45 = '/followers/contains'
+  const PATH46 = '/images'
+  const PATH47 = '/recommendations'
+  const PATH48 = '/recommendations/available-genre-seeds'
+  const PATH49 = '/search'
+  const PATH50 = '/shows'
+  const PATH51 = '/users'
   const GET = 'GET'
   const POST = 'POST'
   const PUT = 'PUT'
@@ -204,13 +206,13 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
           },
           related_artists: {
             /**
-             * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's [listening history](http://news.spotify.com/se/2010/02/03/related-artists/).
+             * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's listening history.
              * @returns A set of artists
              */
             get: (option?: { config?: T | undefined } | undefined) =>
               fetch<Methods6['get']['resBody'], BasicHeaders, Methods6['get']['status']>(prefix, `${prefix1}${PATH3}`, GET, option).json(),
             /**
-             * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's [listening history](http://news.spotify.com/se/2010/02/03/related-artists/).
+             * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's listening history.
              * @returns A set of artists
              */
             $get: (option?: { config?: T | undefined } | undefined) =>
@@ -577,16 +579,6 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
             `${prefix}${PATH17}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         },
         /**
-         * Remove one or more albums from the current user's 'Your Music' library.
-         */
-        delete: (option: { body: Methods25['delete']['reqBody'], query: Methods25['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods25['delete']['status']>(prefix, PATH16, DELETE, option).send(),
-        /**
-         * Remove one or more albums from the current user's 'Your Music' library.
-         */
-        $delete: (option: { body: Methods25['delete']['reqBody'], query: Methods25['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods25['delete']['status']>(prefix, PATH16, DELETE, option).send().then(r => r.body),
-        /**
          * Get a list of the albums saved in the current Spotify user's 'Your Music' library.
          * @returns Pages of albums
          */
@@ -608,7 +600,17 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
          */
         $put: (option: { body: Methods25['put']['reqBody'], query: Methods25['put']['query'], config?: T | undefined }) =>
           fetch<void, BasicHeaders, Methods25['put']['status']>(prefix, PATH16, PUT, option).send().then(r => r.body),
-        $path: (option?: { method: 'delete'; query: Methods25['delete']['query'] } | { method?: 'get' | undefined; query: Methods25['get']['query'] } | { method: 'put'; query: Methods25['put']['query'] } | undefined) =>
+        /**
+         * Remove one or more albums from the current user's 'Your Music' library.
+         */
+        delete: (option: { body: Methods25['delete']['reqBody'], query: Methods25['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods25['delete']['status']>(prefix, PATH16, DELETE, option).send(),
+        /**
+         * Remove one or more albums from the current user's 'Your Music' library.
+         */
+        $delete: (option: { body: Methods25['delete']['reqBody'], query: Methods25['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods25['delete']['status']>(prefix, PATH16, DELETE, option).send().then(r => r.body),
+        $path: (option?: { method?: 'get' | undefined; query: Methods25['get']['query'] } | { method: 'put'; query: Methods25['put']['query'] } | { method: 'delete'; query: Methods25['delete']['query'] } | undefined) =>
           `${prefix}${PATH16}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
       },
       audiobooks: {
@@ -629,24 +631,14 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
             `${prefix}${PATH19}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         },
         /**
-         * Remove one or more audiobooks from the Spotify user's library.
-         */
-        delete: (option: { query: Methods27['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods27['delete']['status']>(prefix, PATH18, DELETE, option).send(),
-        /**
-         * Remove one or more audiobooks from the Spotify user's library.
-         */
-        $delete: (option: { query: Methods27['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods27['delete']['status']>(prefix, PATH18, DELETE, option).send().then(r => r.body),
-        /**
          * Get a list of the audiobooks saved in the current Spotify user's 'Your Music' library.
-         * @returns Pages of audiobooks
+         * @returns Pages of saved audiobooks
          */
         get: (option?: { query?: Methods27['get']['query'] | undefined, config?: T | undefined } | undefined) =>
           fetch<Methods27['get']['resBody'], BasicHeaders, Methods27['get']['status']>(prefix, PATH18, GET, option).json(),
         /**
          * Get a list of the audiobooks saved in the current Spotify user's 'Your Music' library.
-         * @returns Pages of audiobooks
+         * @returns Pages of saved audiobooks
          */
         $get: (option?: { query?: Methods27['get']['query'] | undefined, config?: T | undefined } | undefined) =>
           fetch<Methods27['get']['resBody'], BasicHeaders, Methods27['get']['status']>(prefix, PATH18, GET, option).json().then(r => r.body),
@@ -660,7 +652,17 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
          */
         $put: (option: { query: Methods27['put']['query'], config?: T | undefined }) =>
           fetch<void, BasicHeaders, Methods27['put']['status']>(prefix, PATH18, PUT, option).send().then(r => r.body),
-        $path: (option?: { method: 'delete'; query: Methods27['delete']['query'] } | { method?: 'get' | undefined; query: Methods27['get']['query'] } | { method: 'put'; query: Methods27['put']['query'] } | undefined) =>
+        /**
+         * Remove one or more audiobooks from the Spotify user's library.
+         */
+        delete: (option: { query: Methods27['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods27['delete']['status']>(prefix, PATH18, DELETE, option).send(),
+        /**
+         * Remove one or more audiobooks from the Spotify user's library.
+         */
+        $delete: (option: { query: Methods27['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods27['delete']['status']>(prefix, PATH18, DELETE, option).send().then(r => r.body),
+        $path: (option?: { method?: 'get' | undefined; query: Methods27['get']['query'] } | { method: 'put'; query: Methods27['put']['query'] } | { method: 'delete'; query: Methods27['delete']['query'] } | undefined) =>
           `${prefix}${PATH18}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
       },
       episodes: {
@@ -682,18 +684,6 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
           $path: (option?: { method?: 'get' | undefined; query: Methods30['get']['query'] } | undefined) =>
             `${prefix}${PATH21}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         },
-        /**
-         * Remove one or more episodes from the current user's library.<br/>
-         * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
-         */
-        delete: (option: { body: Methods29['delete']['reqBody'], query: Methods29['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods29['delete']['status']>(prefix, PATH20, DELETE, option).send(),
-        /**
-         * Remove one or more episodes from the current user's library.<br/>
-         * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
-         */
-        $delete: (option: { body: Methods29['delete']['reqBody'], query: Methods29['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods29['delete']['status']>(prefix, PATH20, DELETE, option).send().then(r => r.body),
         /**
          * Get a list of the episodes saved in the current Spotify user's library.<br/>
          * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
@@ -720,7 +710,19 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
          */
         $put: (option: { body: Methods29['put']['reqBody'], query: Methods29['put']['query'], config?: T | undefined }) =>
           fetch<void, BasicHeaders, Methods29['put']['status']>(prefix, PATH20, PUT, option).send().then(r => r.body),
-        $path: (option?: { method: 'delete'; query: Methods29['delete']['query'] } | { method?: 'get' | undefined; query: Methods29['get']['query'] } | { method: 'put'; query: Methods29['put']['query'] } | undefined) =>
+        /**
+         * Remove one or more episodes from the current user's library.<br/>
+         * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
+         */
+        delete: (option: { body: Methods29['delete']['reqBody'], query: Methods29['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods29['delete']['status']>(prefix, PATH20, DELETE, option).send(),
+        /**
+         * Remove one or more episodes from the current user's library.<br/>
+         * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
+         */
+        $delete: (option: { body: Methods29['delete']['reqBody'], query: Methods29['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods29['delete']['status']>(prefix, PATH20, DELETE, option).send().then(r => r.body),
+        $path: (option?: { method?: 'get' | undefined; query: Methods29['get']['query'] } | { method: 'put'; query: Methods29['put']['query'] } | { method: 'delete'; query: Methods29['delete']['query'] } | undefined) =>
           `${prefix}${PATH20}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
       },
       following: {
@@ -740,16 +742,6 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
           $path: (option?: { method?: 'get' | undefined; query: Methods32['get']['query'] } | undefined) =>
             `${prefix}${PATH23}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         },
-        /**
-         * Remove the current user as a follower of one or more artists or other Spotify users.
-         */
-        delete: (option: { body: Methods31['delete']['reqBody'], query: Methods31['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods31['delete']['status']>(prefix, PATH22, DELETE, option).send(),
-        /**
-         * Remove the current user as a follower of one or more artists or other Spotify users.
-         */
-        $delete: (option: { body: Methods31['delete']['reqBody'], query: Methods31['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods31['delete']['status']>(prefix, PATH22, DELETE, option).send().then(r => r.body),
         /**
          * Get the current user's followed artists.
          * @returns A paged set of artists
@@ -772,7 +764,17 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
          */
         $put: (option: { body: Methods31['put']['reqBody'], query: Methods31['put']['query'], config?: T | undefined }) =>
           fetch<void, BasicHeaders, Methods31['put']['status']>(prefix, PATH22, PUT, option).send().then(r => r.body),
-        $path: (option?: { method: 'delete'; query: Methods31['delete']['query'] } | { method?: 'get' | undefined; query: Methods31['get']['query'] } | { method: 'put'; query: Methods31['put']['query'] } | undefined) =>
+        /**
+         * Remove the current user as a follower of one or more artists or other Spotify users.
+         */
+        delete: (option: { body: Methods31['delete']['reqBody'], query: Methods31['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods31['delete']['status']>(prefix, PATH22, DELETE, option).send(),
+        /**
+         * Remove the current user as a follower of one or more artists or other Spotify users.
+         */
+        $delete: (option: { body: Methods31['delete']['reqBody'], query: Methods31['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods31['delete']['status']>(prefix, PATH22, DELETE, option).send().then(r => r.body),
+        $path: (option?: { method?: 'get' | undefined; query: Methods31['get']['query'] } | { method: 'put'; query: Methods31['put']['query'] } | { method: 'delete'; query: Methods31['delete']['query'] } | undefined) =>
           `${prefix}${PATH22}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
       },
       player: {
@@ -1026,16 +1028,6 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
             `${prefix}${PATH39}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         },
         /**
-         * Delete one or more shows from current Spotify user's library.
-         */
-        delete: (option: { query: Methods47['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods47['delete']['status']>(prefix, PATH38, DELETE, option).send(),
-        /**
-         * Delete one or more shows from current Spotify user's library.
-         */
-        $delete: (option: { query: Methods47['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods47['delete']['status']>(prefix, PATH38, DELETE, option).send().then(r => r.body),
-        /**
          * Get a list of shows saved in the current Spotify user's library. Optional parameters can be used to limit the number of shows returned.
          * @returns Pages of shows
          */
@@ -1050,36 +1042,48 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
         /**
          * Save one or more shows to current Spotify user's library.
          */
-        put: (option: { query: Methods47['put']['query'], config?: T | undefined }) =>
+        put: (option: { body: Methods47['put']['reqBody'], query: Methods47['put']['query'], config?: T | undefined }) =>
           fetch<void, BasicHeaders, Methods47['put']['status']>(prefix, PATH38, PUT, option).send(),
         /**
          * Save one or more shows to current Spotify user's library.
          */
-        $put: (option: { query: Methods47['put']['query'], config?: T | undefined }) =>
+        $put: (option: { body: Methods47['put']['reqBody'], query: Methods47['put']['query'], config?: T | undefined }) =>
           fetch<void, BasicHeaders, Methods47['put']['status']>(prefix, PATH38, PUT, option).send().then(r => r.body),
-        $path: (option?: { method: 'delete'; query: Methods47['delete']['query'] } | { method?: 'get' | undefined; query: Methods47['get']['query'] } | { method: 'put'; query: Methods47['put']['query'] } | undefined) =>
+        $path: (option?: { method?: 'get' | undefined; query: Methods47['get']['query'] } | { method: 'put'; query: Methods47['put']['query'] } | undefined) =>
           `${prefix}${PATH38}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
       },
       top: {
-        _type: (val2: number | string) => {
-          const prefix2 = `${PATH40}/${val2}`
-
-          return {
-            /**
-             * Get the current user's top artists or tracks based on calculated affinity.
-             * @returns Pages of artists or tracks
-             */
-            get: (option?: { query?: Methods49['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-              fetch<Methods49['get']['resBody'], BasicHeaders, Methods49['get']['status']>(prefix, prefix2, GET, option).json(),
-            /**
-             * Get the current user's top artists or tracks based on calculated affinity.
-             * @returns Pages of artists or tracks
-             */
-            $get: (option?: { query?: Methods49['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-              fetch<Methods49['get']['resBody'], BasicHeaders, Methods49['get']['status']>(prefix, prefix2, GET, option).json().then(r => r.body),
-            $path: (option?: { method?: 'get' | undefined; query: Methods49['get']['query'] } | undefined) =>
-              `${prefix}${prefix2}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
-          }
+        artists: {
+          /**
+           * Get the current user's top artists based on calculated affinity.
+           * @returns Pages of artists
+           */
+          get: (option?: { query?: Methods49['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods49['get']['resBody'], BasicHeaders, Methods49['get']['status']>(prefix, PATH40, GET, option).json(),
+          /**
+           * Get the current user's top artists based on calculated affinity.
+           * @returns Pages of artists
+           */
+          $get: (option?: { query?: Methods49['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods49['get']['resBody'], BasicHeaders, Methods49['get']['status']>(prefix, PATH40, GET, option).json().then(r => r.body),
+          $path: (option?: { method?: 'get' | undefined; query: Methods49['get']['query'] } | undefined) =>
+            `${prefix}${PATH40}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
+        },
+        tracks: {
+          /**
+           * Get the current user's top tracks based on calculated affinity.
+           * @returns Pages of tracks
+           */
+          get: (option?: { query?: Methods50['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods50['get']['resBody'], BasicHeaders, Methods50['get']['status']>(prefix, PATH41, GET, option).json(),
+          /**
+           * Get the current user's top tracks based on calculated affinity.
+           * @returns Pages of tracks
+           */
+          $get: (option?: { query?: Methods50['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods50['get']['resBody'], BasicHeaders, Methods50['get']['status']>(prefix, PATH41, GET, option).json().then(r => r.body),
+          $path: (option?: { method?: 'get' | undefined; query: Methods50['get']['query'] } | undefined) =>
+            `${prefix}${PATH41}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         }
       },
       tracks: {
@@ -1088,51 +1092,51 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
            * Check if one or more tracks is already saved in the current Spotify user's 'Your Music' library.
            * @returns Array of booleans
            */
-          get: (option: { query: Methods51['get']['query'], config?: T | undefined }) =>
-            fetch<Methods51['get']['resBody'], BasicHeaders, Methods51['get']['status']>(prefix, PATH42, GET, option).json(),
+          get: (option: { query: Methods52['get']['query'], config?: T | undefined }) =>
+            fetch<Methods52['get']['resBody'], BasicHeaders, Methods52['get']['status']>(prefix, PATH43, GET, option).json(),
           /**
            * Check if one or more tracks is already saved in the current Spotify user's 'Your Music' library.
            * @returns Array of booleans
            */
-          $get: (option: { query: Methods51['get']['query'], config?: T | undefined }) =>
-            fetch<Methods51['get']['resBody'], BasicHeaders, Methods51['get']['status']>(prefix, PATH42, GET, option).json().then(r => r.body),
-          $path: (option?: { method?: 'get' | undefined; query: Methods51['get']['query'] } | undefined) =>
-            `${prefix}${PATH42}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
+          $get: (option: { query: Methods52['get']['query'], config?: T | undefined }) =>
+            fetch<Methods52['get']['resBody'], BasicHeaders, Methods52['get']['status']>(prefix, PATH43, GET, option).json().then(r => r.body),
+          $path: (option?: { method?: 'get' | undefined; query: Methods52['get']['query'] } | undefined) =>
+            `${prefix}${PATH43}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         },
         /**
-         * Remove one or more tracks from the current user's 'Your Music' library.
+         * Get a list of the songs saved in the current Spotify user's 'Your Music' library.
+         * @returns Pages of tracks
          */
-        delete: (option: { body: Methods50['delete']['reqBody'], query: Methods50['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods50['delete']['status']>(prefix, PATH41, DELETE, option).send(),
-        /**
-         * Remove one or more tracks from the current user's 'Your Music' library.
-         */
-        $delete: (option: { body: Methods50['delete']['reqBody'], query: Methods50['delete']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods50['delete']['status']>(prefix, PATH41, DELETE, option).send().then(r => r.body),
+        get: (option?: { query?: Methods51['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+          fetch<Methods51['get']['resBody'], BasicHeaders, Methods51['get']['status']>(prefix, PATH42, GET, option).json(),
         /**
          * Get a list of the songs saved in the current Spotify user's 'Your Music' library.
          * @returns Pages of tracks
          */
-        get: (option?: { query?: Methods50['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-          fetch<Methods50['get']['resBody'], BasicHeaders, Methods50['get']['status']>(prefix, PATH41, GET, option).json(),
-        /**
-         * Get a list of the songs saved in the current Spotify user's 'Your Music' library.
-         * @returns Pages of tracks
-         */
-        $get: (option?: { query?: Methods50['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-          fetch<Methods50['get']['resBody'], BasicHeaders, Methods50['get']['status']>(prefix, PATH41, GET, option).json().then(r => r.body),
+        $get: (option?: { query?: Methods51['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+          fetch<Methods51['get']['resBody'], BasicHeaders, Methods51['get']['status']>(prefix, PATH42, GET, option).json().then(r => r.body),
         /**
          * Save one or more tracks to the current user's 'Your Music' library.
          */
-        put: (option: { body: Methods50['put']['reqBody'], query: Methods50['put']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods50['put']['status']>(prefix, PATH41, PUT, option).send(),
+        put: (option: { body: Methods51['put']['reqBody'], query: Methods51['put']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods51['put']['status']>(prefix, PATH42, PUT, option).send(),
         /**
          * Save one or more tracks to the current user's 'Your Music' library.
          */
-        $put: (option: { body: Methods50['put']['reqBody'], query: Methods50['put']['query'], config?: T | undefined }) =>
-          fetch<void, BasicHeaders, Methods50['put']['status']>(prefix, PATH41, PUT, option).send().then(r => r.body),
-        $path: (option?: { method: 'delete'; query: Methods50['delete']['query'] } | { method?: 'get' | undefined; query: Methods50['get']['query'] } | { method: 'put'; query: Methods50['put']['query'] } | undefined) =>
-          `${prefix}${PATH41}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
+        $put: (option: { body: Methods51['put']['reqBody'], query: Methods51['put']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods51['put']['status']>(prefix, PATH42, PUT, option).send().then(r => r.body),
+        /**
+         * Remove one or more tracks from the current user's 'Your Music' library.
+         */
+        delete: (option: { body: Methods51['delete']['reqBody'], query: Methods51['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods51['delete']['status']>(prefix, PATH42, DELETE, option).send(),
+        /**
+         * Remove one or more tracks from the current user's 'Your Music' library.
+         */
+        $delete: (option: { body: Methods51['delete']['reqBody'], query: Methods51['delete']['query'], config?: T | undefined }) =>
+          fetch<void, BasicHeaders, Methods51['delete']['status']>(prefix, PATH42, DELETE, option).send().then(r => r.body),
+        $path: (option?: { method?: 'get' | undefined; query: Methods51['get']['query'] } | { method: 'put'; query: Methods51['put']['query'] } | { method: 'delete'; query: Methods51['delete']['query'] } | undefined) =>
+          `${prefix}${PATH42}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
       },
       /**
        * Get detailed profile information about the current user (including the
@@ -1161,38 +1165,28 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
                * Check to see if one or more Spotify users are following a specified playlist.
                * @returns Array of booleans
                */
-              get: (option: { query: Methods54['get']['query'], config?: T | undefined }) =>
-                fetch<Methods54['get']['resBody'], BasicHeaders, Methods54['get']['status']>(prefix, `${prefix1}${PATH44}`, GET, option).json(),
+              get: (option: { query: Methods55['get']['query'], config?: T | undefined }) =>
+                fetch<Methods55['get']['resBody'], BasicHeaders, Methods55['get']['status']>(prefix, `${prefix1}${PATH45}`, GET, option).json(),
               /**
                * Check to see if one or more Spotify users are following a specified playlist.
                * @returns Array of booleans
                */
-              $get: (option: { query: Methods54['get']['query'], config?: T | undefined }) =>
-                fetch<Methods54['get']['resBody'], BasicHeaders, Methods54['get']['status']>(prefix, `${prefix1}${PATH44}`, GET, option).json().then(r => r.body),
-              $path: (option?: { method?: 'get' | undefined; query: Methods54['get']['query'] } | undefined) =>
-                `${prefix}${prefix1}${PATH44}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
+              $get: (option: { query: Methods55['get']['query'], config?: T | undefined }) =>
+                fetch<Methods55['get']['resBody'], BasicHeaders, Methods55['get']['status']>(prefix, `${prefix1}${PATH45}`, GET, option).json().then(r => r.body),
+              $path: (option?: { method?: 'get' | undefined; query: Methods55['get']['query'] } | undefined) =>
+                `${prefix}${prefix1}${PATH45}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
             },
             /**
-             * Remove the current user as a follower of a playlist.
+             * Add the current user as a follower of a playlist.
              */
-            delete: (option?: { config?: T | undefined } | undefined) =>
-              fetch<void, BasicHeaders, Methods53['delete']['status']>(prefix, `${prefix1}${PATH43}`, DELETE, option).send(),
-            /**
-             * Remove the current user as a follower of a playlist.
-             */
-            $delete: (option?: { config?: T | undefined } | undefined) =>
-              fetch<void, BasicHeaders, Methods53['delete']['status']>(prefix, `${prefix1}${PATH43}`, DELETE, option).send().then(r => r.body),
+            put: (option: { body: Methods54['put']['reqBody'], config?: T | undefined }) =>
+              fetch<void, BasicHeaders, Methods54['put']['status']>(prefix, `${prefix1}${PATH44}`, PUT, option).send(),
             /**
              * Add the current user as a follower of a playlist.
              */
-            put: (option: { body: Methods53['put']['reqBody'], config?: T | undefined }) =>
-              fetch<void, BasicHeaders, Methods53['put']['status']>(prefix, `${prefix1}${PATH43}`, PUT, option).send(),
-            /**
-             * Add the current user as a follower of a playlist.
-             */
-            $put: (option: { body: Methods53['put']['reqBody'], config?: T | undefined }) =>
-              fetch<void, BasicHeaders, Methods53['put']['status']>(prefix, `${prefix1}${PATH43}`, PUT, option).send().then(r => r.body),
-            $path: () => `${prefix}${prefix1}${PATH43}`
+            $put: (option: { body: Methods54['put']['reqBody'], config?: T | undefined }) =>
+              fetch<void, BasicHeaders, Methods54['put']['status']>(prefix, `${prefix1}${PATH44}`, PUT, option).send().then(r => r.body),
+            $path: () => `${prefix}${prefix1}${PATH44}`
           },
           images: {
             /**
@@ -1200,65 +1194,102 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
              * @returns A set of images
              */
             get: (option?: { config?: T | undefined } | undefined) =>
-              fetch<Methods55['get']['resBody'], BasicHeaders, Methods55['get']['status']>(prefix, `${prefix1}${PATH45}`, GET, option).json(),
+              fetch<Methods56['get']['resBody'], BasicHeaders, Methods56['get']['status']>(prefix, `${prefix1}${PATH46}`, GET, option).json(),
             /**
              * Get the current image associated with a specific playlist.
              * @returns A set of images
              */
             $get: (option?: { config?: T | undefined } | undefined) =>
-              fetch<Methods55['get']['resBody'], BasicHeaders, Methods55['get']['status']>(prefix, `${prefix1}${PATH45}`, GET, option).json().then(r => r.body),
+              fetch<Methods56['get']['resBody'], BasicHeaders, Methods56['get']['status']>(prefix, `${prefix1}${PATH46}`, GET, option).json().then(r => r.body),
             /**
              * Replace the image used to represent a specific playlist.
              */
             put: (option?: { config?: T | undefined } | undefined) =>
-              fetch<void, BasicHeaders, Methods55['put']['status']>(prefix, `${prefix1}${PATH45}`, PUT, option).send(),
+              fetch<void, BasicHeaders, Methods56['put']['status']>(prefix, `${prefix1}${PATH46}`, PUT, option).send(),
             /**
              * Replace the image used to represent a specific playlist.
              */
             $put: (option?: { config?: T | undefined } | undefined) =>
-              fetch<void, BasicHeaders, Methods55['put']['status']>(prefix, `${prefix1}${PATH45}`, PUT, option).send().then(r => r.body),
-            $path: () => `${prefix}${prefix1}${PATH45}`
+              fetch<void, BasicHeaders, Methods56['put']['status']>(prefix, `${prefix1}${PATH46}`, PUT, option).send().then(r => r.body),
+            $path: () => `${prefix}${prefix1}${PATH46}`
           },
           tracks: {
             /**
-             * Remove one or more items from a user's playlist.
-             * @returns A snapshot ID for the playlist
+             * Get full details of the items of a playlist owned by a Spotify user.
+             * @returns Pages of tracks
              */
-            delete: (option: { body: Methods56['delete']['reqBody'], config?: T | undefined }) =>
-              fetch<Methods56['delete']['resBody'], BasicHeaders, Methods56['delete']['status']>(prefix, `${prefix1}${PATH1}`, DELETE, option).json(),
+            get: (option?: { query?: Methods57['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+              fetch<Methods57['get']['resBody'], BasicHeaders, Methods57['get']['status']>(prefix, `${prefix1}${PATH1}`, GET, option).json(),
             /**
-             * Remove one or more items from a user's playlist.
+             * Get full details of the items of a playlist owned by a Spotify user.
+             * @returns Pages of tracks
+             */
+            $get: (option?: { query?: Methods57['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+              fetch<Methods57['get']['resBody'], BasicHeaders, Methods57['get']['status']>(prefix, `${prefix1}${PATH1}`, GET, option).json().then(r => r.body),
+            /**
+             * Add one or more items to a user's playlist.
              * @returns A snapshot ID for the playlist
              */
-            $delete: (option: { body: Methods56['delete']['reqBody'], config?: T | undefined }) =>
-              fetch<Methods56['delete']['resBody'], BasicHeaders, Methods56['delete']['status']>(prefix, `${prefix1}${PATH1}`, DELETE, option).json().then(r => r.body),
-            $path: () => `${prefix}${prefix1}${PATH1}`
+            post: (option: { body: Methods57['post']['reqBody'], query?: Methods57['post']['query'] | undefined, config?: T | undefined }) =>
+              fetch<Methods57['post']['resBody'], BasicHeaders, Methods57['post']['status']>(prefix, `${prefix1}${PATH1}`, POST, option).json(),
+            /**
+             * Add one or more items to a user's playlist.
+             * @returns A snapshot ID for the playlist
+             */
+            $post: (option: { body: Methods57['post']['reqBody'], query?: Methods57['post']['query'] | undefined, config?: T | undefined }) =>
+              fetch<Methods57['post']['resBody'], BasicHeaders, Methods57['post']['status']>(prefix, `${prefix1}${PATH1}`, POST, option).json().then(r => r.body),
+            /**
+             * Either reorder or replace items in a playlist depending on the request's parameters.
+             * To reorder items, include `range_start`, `insert_before`, `range_length` and `snapshot_id` in the request's body.
+             * To replace items, include `uris` as either a query parameter or in the request's body.
+             * Replacing items in a playlist will overwrite its existing items. This operation can be used for replacing or clearing items in a playlist.
+             * <br/>
+             * **Note**: Replace and reorder are mutually exclusive operations which share the same endpoint, but have different parameters.
+             * These operations can't be applied together in a single request.
+             * @returns A snapshot ID for the playlist
+             */
+            put: (option: { body: Methods57['put']['reqBody'], query?: Methods57['put']['query'] | undefined, config?: T | undefined }) =>
+              fetch<Methods57['put']['resBody'], BasicHeaders, Methods57['put']['status']>(prefix, `${prefix1}${PATH1}`, PUT, option).json(),
+            /**
+             * Either reorder or replace items in a playlist depending on the request's parameters.
+             * To reorder items, include `range_start`, `insert_before`, `range_length` and `snapshot_id` in the request's body.
+             * To replace items, include `uris` as either a query parameter or in the request's body.
+             * Replacing items in a playlist will overwrite its existing items. This operation can be used for replacing or clearing items in a playlist.
+             * <br/>
+             * **Note**: Replace and reorder are mutually exclusive operations which share the same endpoint, but have different parameters.
+             * These operations can't be applied together in a single request.
+             * @returns A snapshot ID for the playlist
+             */
+            $put: (option: { body: Methods57['put']['reqBody'], query?: Methods57['put']['query'] | undefined, config?: T | undefined }) =>
+              fetch<Methods57['put']['resBody'], BasicHeaders, Methods57['put']['status']>(prefix, `${prefix1}${PATH1}`, PUT, option).json().then(r => r.body),
+            $path: (option?: { method?: 'get' | undefined; query: Methods57['get']['query'] } | { method: 'post'; query: Methods57['post']['query'] } | { method: 'put'; query: Methods57['put']['query'] } | undefined) =>
+              `${prefix}${prefix1}${PATH1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
           },
           /**
            * Get a playlist owned by a Spotify user.
            * @returns A playlist
            */
-          get: (option?: { query?: Methods52['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-            fetch<Methods52['get']['resBody'], BasicHeaders, Methods52['get']['status']>(prefix, prefix1, GET, option).json(),
+          get: (option?: { query?: Methods53['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods53['get']['resBody'], BasicHeaders, Methods53['get']['status']>(prefix, prefix1, GET, option).json(),
           /**
            * Get a playlist owned by a Spotify user.
            * @returns A playlist
            */
-          $get: (option?: { query?: Methods52['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-            fetch<Methods52['get']['resBody'], BasicHeaders, Methods52['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
+          $get: (option?: { query?: Methods53['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods53['get']['resBody'], BasicHeaders, Methods53['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
           /**
            * Change a playlist's name and public/private state. (The user must, of
            * course, own the playlist.)
            */
-          put: (option: { body: Methods52['put']['reqBody'], config?: T | undefined }) =>
-            fetch<void, BasicHeaders, Methods52['put']['status']>(prefix, prefix1, PUT, option).send(),
+          put: (option: { body: Methods53['put']['reqBody'], config?: T | undefined }) =>
+            fetch<void, BasicHeaders, Methods53['put']['status']>(prefix, prefix1, PUT, option).send(),
           /**
            * Change a playlist's name and public/private state. (The user must, of
            * course, own the playlist.)
            */
-          $put: (option: { body: Methods52['put']['reqBody'], config?: T | undefined }) =>
-            fetch<void, BasicHeaders, Methods52['put']['status']>(prefix, prefix1, PUT, option).send().then(r => r.body),
-          $path: (option?: { method?: 'get' | undefined; query: Methods52['get']['query'] } | undefined) =>
+          $put: (option: { body: Methods53['put']['reqBody'], config?: T | undefined }) =>
+            fetch<void, BasicHeaders, Methods53['put']['status']>(prefix, prefix1, PUT, option).send().then(r => r.body),
+          $path: (option?: { method?: 'get' | undefined; query: Methods53['get']['query'] } | undefined) =>
             `${prefix}${prefix1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         }
       }
@@ -1270,14 +1301,14 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
          * @returns A set of genres
          */
         get: (option?: { config?: T | undefined } | undefined) =>
-          fetch<Methods58['get']['resBody'], BasicHeaders, Methods58['get']['status']>(prefix, PATH47, GET, option).json(),
+          fetch<Methods59['get']['resBody'], BasicHeaders, Methods59['get']['status']>(prefix, PATH48, GET, option).json(),
         /**
          * Retrieve a list of available genres seed parameter values for [recommendations](/documentation/web-api/reference/get-recommendations).
          * @returns A set of genres
          */
         $get: (option?: { config?: T | undefined } | undefined) =>
-          fetch<Methods58['get']['resBody'], BasicHeaders, Methods58['get']['status']>(prefix, PATH47, GET, option).json().then(r => r.body),
-        $path: () => `${prefix}${PATH47}`
+          fetch<Methods59['get']['resBody'], BasicHeaders, Methods59['get']['status']>(prefix, PATH48, GET, option).json().then(r => r.body),
+        $path: () => `${prefix}${PATH48}`
       },
       /**
        * Recommendations are generated based on the available information for a given seed entity and matched against similar artists and tracks. If there is sufficient information about the provided seeds, a list of tracks will be returned together with pool size details.
@@ -1285,18 +1316,18 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
        * For artists and tracks that are very new or obscure there might not be enough data to generate a list of tracks.
        * @returns A set of recommendations
        */
-      get: (option: { query: Methods57['get']['query'], config?: T | undefined }) =>
-        fetch<Methods57['get']['resBody'], BasicHeaders, Methods57['get']['status']>(prefix, PATH46, GET, option).json(),
+      get: (option?: { query?: Methods58['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+        fetch<Methods58['get']['resBody'], BasicHeaders, Methods58['get']['status']>(prefix, PATH47, GET, option).json(),
       /**
        * Recommendations are generated based on the available information for a given seed entity and matched against similar artists and tracks. If there is sufficient information about the provided seeds, a list of tracks will be returned together with pool size details.
        *
        * For artists and tracks that are very new or obscure there might not be enough data to generate a list of tracks.
        * @returns A set of recommendations
        */
-      $get: (option: { query: Methods57['get']['query'], config?: T | undefined }) =>
-        fetch<Methods57['get']['resBody'], BasicHeaders, Methods57['get']['status']>(prefix, PATH46, GET, option).json().then(r => r.body),
-      $path: (option?: { method?: 'get' | undefined; query: Methods57['get']['query'] } | undefined) =>
-        `${prefix}${PATH46}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
+      $get: (option?: { query?: Methods58['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+        fetch<Methods58['get']['resBody'], BasicHeaders, Methods58['get']['status']>(prefix, PATH47, GET, option).json().then(r => r.body),
+      $path: (option?: { method?: 'get' | undefined; query: Methods58['get']['query'] } | undefined) =>
+        `${prefix}${PATH47}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     },
     search: {
       /**
@@ -1305,22 +1336,22 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
        * **Note: Audiobooks are only available for the US, UK, Ireland, New Zealand and Australia markets.**
        * @returns Search response
        */
-      get: (option: { query: Methods59['get']['query'], config?: T | undefined }) =>
-        fetch<Methods59['get']['resBody'], BasicHeaders, Methods59['get']['status']>(prefix, PATH48, GET, option).json(),
+      get: (option: { query: Methods60['get']['query'], config?: T | undefined }) =>
+        fetch<Methods60['get']['resBody'], BasicHeaders, Methods60['get']['status']>(prefix, PATH49, GET, option).json(),
       /**
        * Get Spotify catalog information about albums, artists, playlists, tracks, shows, episodes or audiobooks
        * that match a keyword string.<br />
        * **Note: Audiobooks are only available for the US, UK, Ireland, New Zealand and Australia markets.**
        * @returns Search response
        */
-      $get: (option: { query: Methods59['get']['query'], config?: T | undefined }) =>
-        fetch<Methods59['get']['resBody'], BasicHeaders, Methods59['get']['status']>(prefix, PATH48, GET, option).json().then(r => r.body),
-      $path: (option?: { method?: 'get' | undefined; query: Methods59['get']['query'] } | undefined) =>
-        `${prefix}${PATH48}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
+      $get: (option: { query: Methods60['get']['query'], config?: T | undefined }) =>
+        fetch<Methods60['get']['resBody'], BasicHeaders, Methods60['get']['status']>(prefix, PATH49, GET, option).json().then(r => r.body),
+      $path: (option?: { method?: 'get' | undefined; query: Methods60['get']['query'] } | undefined) =>
+        `${prefix}${PATH49}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     },
     shows: {
       _id: (val1: string) => {
-        const prefix1 = `${PATH49}/${val1}`
+        const prefix1 = `${PATH50}/${val1}`
 
         return {
           episodes: {
@@ -1328,15 +1359,15 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
              * Get Spotify catalog information about an show’s episodes. Optional parameters can be used to limit the number of episodes returned.
              * @returns Pages of episodes
              */
-            get: (option?: { query?: Methods62['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-              fetch<Methods62['get']['resBody'], BasicHeaders, Methods62['get']['status']>(prefix, `${prefix1}${PATH13}`, GET, option).json(),
+            get: (option?: { query?: Methods63['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+              fetch<Methods63['get']['resBody'], BasicHeaders, Methods63['get']['status']>(prefix, `${prefix1}${PATH13}`, GET, option).json(),
             /**
              * Get Spotify catalog information about an show’s episodes. Optional parameters can be used to limit the number of episodes returned.
              * @returns Pages of episodes
              */
-            $get: (option?: { query?: Methods62['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-              fetch<Methods62['get']['resBody'], BasicHeaders, Methods62['get']['status']>(prefix, `${prefix1}${PATH13}`, GET, option).json().then(r => r.body),
-            $path: (option?: { method?: 'get' | undefined; query: Methods62['get']['query'] } | undefined) =>
+            $get: (option?: { query?: Methods63['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+              fetch<Methods63['get']['resBody'], BasicHeaders, Methods63['get']['status']>(prefix, `${prefix1}${PATH13}`, GET, option).json().then(r => r.body),
+            $path: (option?: { method?: 'get' | undefined; query: Methods63['get']['query'] } | undefined) =>
               `${prefix}${prefix1}${PATH13}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
           },
           /**
@@ -1344,16 +1375,16 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
            * unique Spotify ID.
            * @returns A show
            */
-          get: (option?: { query?: Methods61['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-            fetch<Methods61['get']['resBody'], BasicHeaders, Methods61['get']['status']>(prefix, prefix1, GET, option).json(),
+          get: (option?: { query?: Methods62['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods62['get']['resBody'], BasicHeaders, Methods62['get']['status']>(prefix, prefix1, GET, option).json(),
           /**
            * Get Spotify catalog information for a single show identified by its
            * unique Spotify ID.
            * @returns A show
            */
-          $get: (option?: { query?: Methods61['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-            fetch<Methods61['get']['resBody'], BasicHeaders, Methods61['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
-          $path: (option?: { method?: 'get' | undefined; query: Methods61['get']['query'] } | undefined) =>
+          $get: (option?: { query?: Methods62['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods62['get']['resBody'], BasicHeaders, Methods62['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
+          $path: (option?: { method?: 'get' | undefined; query: Methods62['get']['query'] } | undefined) =>
             `${prefix}${prefix1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         }
       },
@@ -1361,16 +1392,16 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
        * Get Spotify catalog information for several shows based on their Spotify IDs.
        * @returns A set of shows
        */
-      get: (option: { query: Methods60['get']['query'], config?: T | undefined }) =>
-        fetch<Methods60['get']['resBody'], BasicHeaders, Methods60['get']['status']>(prefix, PATH49, GET, option).json(),
+      get: (option: { query: Methods61['get']['query'], config?: T | undefined }) =>
+        fetch<Methods61['get']['resBody'], BasicHeaders, Methods61['get']['status']>(prefix, PATH50, GET, option).json(),
       /**
        * Get Spotify catalog information for several shows based on their Spotify IDs.
        * @returns A set of shows
        */
-      $get: (option: { query: Methods60['get']['query'], config?: T | undefined }) =>
-        fetch<Methods60['get']['resBody'], BasicHeaders, Methods60['get']['status']>(prefix, PATH49, GET, option).json().then(r => r.body),
-      $path: (option?: { method?: 'get' | undefined; query: Methods60['get']['query'] } | undefined) =>
-        `${prefix}${PATH49}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
+      $get: (option: { query: Methods61['get']['query'], config?: T | undefined }) =>
+        fetch<Methods61['get']['resBody'], BasicHeaders, Methods61['get']['status']>(prefix, PATH50, GET, option).json().then(r => r.body),
+      $path: (option?: { method?: 'get' | undefined; query: Methods61['get']['query'] } | undefined) =>
+        `${prefix}${PATH50}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     },
     tracks: {
       _id: (val1: string) => {
@@ -1382,16 +1413,16 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
            * unique Spotify ID.
            * @returns A track
            */
-          get: (option?: { query?: Methods64['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-            fetch<Methods64['get']['resBody'], BasicHeaders, Methods64['get']['status']>(prefix, prefix1, GET, option).json(),
+          get: (option?: { query?: Methods65['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods65['get']['resBody'], BasicHeaders, Methods65['get']['status']>(prefix, prefix1, GET, option).json(),
           /**
            * Get Spotify catalog information for a single track identified by its
            * unique Spotify ID.
            * @returns A track
            */
-          $get: (option?: { query?: Methods64['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-            fetch<Methods64['get']['resBody'], BasicHeaders, Methods64['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
-          $path: (option?: { method?: 'get' | undefined; query: Methods64['get']['query'] } | undefined) =>
+          $get: (option?: { query?: Methods65['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+            fetch<Methods65['get']['resBody'], BasicHeaders, Methods65['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
+          $path: (option?: { method?: 'get' | undefined; query: Methods65['get']['query'] } | undefined) =>
             `${prefix}${prefix1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
         }
       },
@@ -1399,20 +1430,20 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
        * Get Spotify catalog information for multiple tracks based on their Spotify IDs.
        * @returns A set of tracks
        */
-      get: (option: { query: Methods63['get']['query'], config?: T | undefined }) =>
-        fetch<Methods63['get']['resBody'], BasicHeaders, Methods63['get']['status']>(prefix, PATH1, GET, option).json(),
+      get: (option: { query: Methods64['get']['query'], config?: T | undefined }) =>
+        fetch<Methods64['get']['resBody'], BasicHeaders, Methods64['get']['status']>(prefix, PATH1, GET, option).json(),
       /**
        * Get Spotify catalog information for multiple tracks based on their Spotify IDs.
        * @returns A set of tracks
        */
-      $get: (option: { query: Methods63['get']['query'], config?: T | undefined }) =>
-        fetch<Methods63['get']['resBody'], BasicHeaders, Methods63['get']['status']>(prefix, PATH1, GET, option).json().then(r => r.body),
-      $path: (option?: { method?: 'get' | undefined; query: Methods63['get']['query'] } | undefined) =>
+      $get: (option: { query: Methods64['get']['query'], config?: T | undefined }) =>
+        fetch<Methods64['get']['resBody'], BasicHeaders, Methods64['get']['status']>(prefix, PATH1, GET, option).json().then(r => r.body),
+      $path: (option?: { method?: 'get' | undefined; query: Methods64['get']['query'] } | undefined) =>
         `${prefix}${PATH1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     },
     users: {
       _user_id: (val1: string) => {
-        const prefix1 = `${PATH50}/${val1}`
+        const prefix1 = `${PATH51}/${val1}`
 
         return {
           playlists: {
@@ -1420,29 +1451,29 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
              * Get a list of the playlists owned or followed by a Spotify user.
              * @returns A paged set of playlists
              */
-            get: (option?: { query?: Methods66['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-              fetch<Methods66['get']['resBody'], BasicHeaders, Methods66['get']['status']>(prefix, `${prefix1}${PATH10}`, GET, option).json(),
+            get: (option?: { query?: Methods67['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+              fetch<Methods67['get']['resBody'], BasicHeaders, Methods67['get']['status']>(prefix, `${prefix1}${PATH10}`, GET, option).json(),
             /**
              * Get a list of the playlists owned or followed by a Spotify user.
              * @returns A paged set of playlists
              */
-            $get: (option?: { query?: Methods66['get']['query'] | undefined, config?: T | undefined } | undefined) =>
-              fetch<Methods66['get']['resBody'], BasicHeaders, Methods66['get']['status']>(prefix, `${prefix1}${PATH10}`, GET, option).json().then(r => r.body),
+            $get: (option?: { query?: Methods67['get']['query'] | undefined, config?: T | undefined } | undefined) =>
+              fetch<Methods67['get']['resBody'], BasicHeaders, Methods67['get']['status']>(prefix, `${prefix1}${PATH10}`, GET, option).json().then(r => r.body),
             /**
              * Create a playlist for a Spotify user. (The playlist will be empty until
              * you [add tracks](/documentation/web-api/reference/add-tracks-to-playlist).)
              * @returns A playlist
              */
-            post: (option: { body: Methods66['post']['reqBody'], config?: T | undefined }) =>
-              fetch<Methods66['post']['resBody'], BasicHeaders, Methods66['post']['status']>(prefix, `${prefix1}${PATH10}`, POST, option).json(),
+            post: (option: { body: Methods67['post']['reqBody'], config?: T | undefined }) =>
+              fetch<Methods67['post']['resBody'], BasicHeaders, Methods67['post']['status']>(prefix, `${prefix1}${PATH10}`, POST, option).json(),
             /**
              * Create a playlist for a Spotify user. (The playlist will be empty until
              * you [add tracks](/documentation/web-api/reference/add-tracks-to-playlist).)
              * @returns A playlist
              */
-            $post: (option: { body: Methods66['post']['reqBody'], config?: T | undefined }) =>
-              fetch<Methods66['post']['resBody'], BasicHeaders, Methods66['post']['status']>(prefix, `${prefix1}${PATH10}`, POST, option).json().then(r => r.body),
-            $path: (option?: { method?: 'get' | undefined; query: Methods66['get']['query'] } | undefined) =>
+            $post: (option: { body: Methods67['post']['reqBody'], config?: T | undefined }) =>
+              fetch<Methods67['post']['resBody'], BasicHeaders, Methods67['post']['status']>(prefix, `${prefix1}${PATH10}`, POST, option).json().then(r => r.body),
+            $path: (option?: { method?: 'get' | undefined; query: Methods67['get']['query'] } | undefined) =>
               `${prefix}${prefix1}${PATH10}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
           },
           /**
@@ -1450,13 +1481,13 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
            * @returns A user
            */
           get: (option?: { config?: T | undefined } | undefined) =>
-            fetch<Methods65['get']['resBody'], BasicHeaders, Methods65['get']['status']>(prefix, prefix1, GET, option).json(),
+            fetch<Methods66['get']['resBody'], BasicHeaders, Methods66['get']['status']>(prefix, prefix1, GET, option).json(),
           /**
            * Get public profile information about a Spotify user.
            * @returns A user
            */
           $get: (option?: { config?: T | undefined } | undefined) =>
-            fetch<Methods65['get']['resBody'], BasicHeaders, Methods65['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
+            fetch<Methods66['get']['resBody'], BasicHeaders, Methods66['get']['status']>(prefix, prefix1, GET, option).json().then(r => r.body),
           $path: () => `${prefix}${prefix1}`
         }
       }

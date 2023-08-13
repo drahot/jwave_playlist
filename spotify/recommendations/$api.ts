@@ -31,7 +31,7 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
      * For artists and tracks that are very new or obscure there might not be enough data to generate a list of tracks.
      * @returns A set of recommendations
      */
-    get: (option: { query: Methods0['get']['query'], config?: T | undefined }) =>
+    get: (option?: { query?: Methods0['get']['query'] | undefined, config?: T | undefined } | undefined) =>
       fetch<Methods0['get']['resBody'], BasicHeaders, Methods0['get']['status']>(prefix, PATH0, GET, option).json(),
     /**
      * Recommendations are generated based on the available information for a given seed entity and matched against similar artists and tracks. If there is sufficient information about the provided seeds, a list of tracks will be returned together with pool size details.
@@ -39,7 +39,7 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
      * For artists and tracks that are very new or obscure there might not be enough data to generate a list of tracks.
      * @returns A set of recommendations
      */
-    $get: (option: { query: Methods0['get']['query'], config?: T | undefined }) =>
+    $get: (option?: { query?: Methods0['get']['query'] | undefined, config?: T | undefined } | undefined) =>
       fetch<Methods0['get']['resBody'], BasicHeaders, Methods0['get']['status']>(prefix, PATH0, GET, option).json().then(r => r.body),
     $path: (option?: { method?: 'get' | undefined; query: Methods0['get']['query'] } | undefined) =>
       `${prefix}${PATH0}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`

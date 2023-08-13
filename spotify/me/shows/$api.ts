@@ -9,7 +9,6 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
   const PATH1 = '/me/shows/contains'
   const GET = 'GET'
   const PUT = 'PUT'
-  const DELETE = 'DELETE'
 
   return {
     contains: {
@@ -29,16 +28,6 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
         `${prefix}${PATH1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     },
     /**
-     * Delete one or more shows from current Spotify user's library.
-     */
-    delete: (option: { query: Methods0['delete']['query'], config?: T | undefined }) =>
-      fetch<void, BasicHeaders, Methods0['delete']['status']>(prefix, PATH0, DELETE, option).send(),
-    /**
-     * Delete one or more shows from current Spotify user's library.
-     */
-    $delete: (option: { query: Methods0['delete']['query'], config?: T | undefined }) =>
-      fetch<void, BasicHeaders, Methods0['delete']['status']>(prefix, PATH0, DELETE, option).send().then(r => r.body),
-    /**
      * Get a list of shows saved in the current Spotify user's library. Optional parameters can be used to limit the number of shows returned.
      * @returns Pages of shows
      */
@@ -53,14 +42,14 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
     /**
      * Save one or more shows to current Spotify user's library.
      */
-    put: (option: { query: Methods0['put']['query'], config?: T | undefined }) =>
+    put: (option: { body: Methods0['put']['reqBody'], query: Methods0['put']['query'], config?: T | undefined }) =>
       fetch<void, BasicHeaders, Methods0['put']['status']>(prefix, PATH0, PUT, option).send(),
     /**
      * Save one or more shows to current Spotify user's library.
      */
-    $put: (option: { query: Methods0['put']['query'], config?: T | undefined }) =>
+    $put: (option: { body: Methods0['put']['reqBody'], query: Methods0['put']['query'], config?: T | undefined }) =>
       fetch<void, BasicHeaders, Methods0['put']['status']>(prefix, PATH0, PUT, option).send().then(r => r.body),
-    $path: (option?: { method: 'delete'; query: Methods0['delete']['query'] } | { method?: 'get' | undefined; query: Methods0['get']['query'] } | { method: 'put'; query: Methods0['put']['query'] } | undefined) =>
+    $path: (option?: { method?: 'get' | undefined; query: Methods0['get']['query'] } | { method: 'put'; query: Methods0['put']['query'] } | undefined) =>
       `${prefix}${PATH0}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
   }
 }

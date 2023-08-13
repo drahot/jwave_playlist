@@ -26,7 +26,7 @@ export const spotify = (accessToken: string) => {
         '%20'
       )
       const data = await client.get({
-        query: { q: query, type: 'track', limit: 50 },
+        query: { q: query, type: ['track'], limit: 50 },
         config: {
           headers: {
             Authorization: `Bearer ${accessToken}`,

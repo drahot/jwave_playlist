@@ -37,13 +37,13 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
         },
         related_artists: {
           /**
-           * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's [listening history](http://news.spotify.com/se/2010/02/03/related-artists/).
+           * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's listening history.
            * @returns A set of artists
            */
           get: (option?: { config?: T | undefined } | undefined) =>
             fetch<Methods3['get']['resBody'], BasicHeaders, Methods3['get']['status']>(prefix, `${prefix0}${PATH2}`, GET, option).json(),
           /**
-           * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's [listening history](http://news.spotify.com/se/2010/02/03/related-artists/).
+           * Get Spotify catalog information about artists similar to a given artist. Similarity is based on analysis of the Spotify community's listening history.
            * @returns A set of artists
            */
           $get: (option?: { config?: T | undefined } | undefined) =>
