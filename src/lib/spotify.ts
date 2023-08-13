@@ -77,15 +77,7 @@ export const spotify = (accessToken: string) => {
             },
           },
         })
-        const { body, status } = data
-
-        if (status !== 201) {
-          return {
-            data: undefined,
-            error: new Error(`create playlist error: statusCode=${status}`),
-          }
-        }
-
+        const { body } = data
         return { data: body, error: undefined }
       } catch (e) {
         const error = e as Error
@@ -94,46 +86,44 @@ export const spotify = (accessToken: string) => {
     },
     //
     addItemsToPlaylist: async (playlistId: string, trackUris: string[]) => {
-      const client = playlistsApi.default(aspida())
-      const data = await client._playlist_id(playlistId).tracks.post({
-        body: { position: 0, uris: trackUris },
-        config: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      try {
+        const client = playlistsApi.default(aspida())
+        const data = await client._playlist_id(playlistId).tracks.post({
+          body: { position: 0, uris: trackUris },
+          config: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        },
-      })
+        })
 
-      const { body, status } = data
-
-      if (status !== 201) {
-        return {
-          data: undefined,
-          error: new Error(`add playlist error: statusCode=${status}`),
-        }
+        const { body } = data
+        return { data: body, error: undefined }
+      } catch (e) {
+        const error = e as Error
+        return { data: undefined, error: error }
       }
-
-      return { data: body, error: undefined }
     },
     me: async () => {
       const client = meApi.default(aspida())
-      const data = await client.get({
-        config: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      try {
+        const data = await client.get({
+          config: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        },
-      })
-      const { body, status } = data
+        })
+        const { body } = data
 
-      if (status !== 200) {
+        return { data: body, error: undefined }
+      } catch (e) {
+        const error = e as Error
         return {
           data: undefined,
-          error: new Error(`add playlist error: statusCode=${status}`),
+          error: error,
         }
       }
-
-      return { data: body, error: undefined }
     },
   }
 }

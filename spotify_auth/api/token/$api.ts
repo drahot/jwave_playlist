@@ -2,8 +2,8 @@ import type { AspidaClient } from 'aspida'
 import type { Methods as Methods0 } from '.'
 
 const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
-  const prefix = (baseURL === undefined ? 'https://accounts.spotify.com/api' : baseURL).replace(/\/$/, '')
-  const PATH0 = '/token'
+  const prefix = (baseURL === undefined ? 'https://accounts.spotify.com' : baseURL).replace(/\/$/, '')
+  const PATH0 = '/api/token'
   const POST = 'POST'
 
   return {

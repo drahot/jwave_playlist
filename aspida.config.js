@@ -11,6 +11,6 @@ module.exports = [
   {
     input: 'spotify_auth',
     outputEachDir: true,
-    baseURL: 'https://accounts.spotify.com/api',
+    baseURL: 'https://accounts.spotify.com',
   },
 ]

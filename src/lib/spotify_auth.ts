@@ -3,7 +3,7 @@
 import env from 'dotenv'
 import api from '../../spotify_auth/$api'
 import aspida from '@aspida/axios'
-import { AuthResult } from '../../spotify_auth/token'
+import { AuthResult } from '../../spotify_auth/api/token'
 import { Result } from './result'
 
 env.config()
