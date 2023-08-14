@@ -8,6 +8,7 @@ import { Result } from './result'
 
 env.config()
 
+// noinspection JSUnusedGlobalSymbols
 export const token = async (): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
     return { data: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
