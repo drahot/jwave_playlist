@@ -65,14 +65,16 @@ export const authorize = async (): Promise<Result<string>> => {
   const client = api(aspida())
   try {
     const { body } = await client.authorize.get({
-      body: {
+      query: {
         client_id: clientId,
         response_type: 'code',
         state: state,
         redirect_uri: 'http://localhost',
         scope: 'user-read-currently-playing playlist-modify-private',
+        show_dialog: false,
       },
     })
+
     const redirectUri = new TextDecoder().decode(body)
     const url = new URL(redirectUri)
     if (state !== url.searchParams.get('state') ?? '') {

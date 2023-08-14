@@ -1,4 +1,5 @@
 import type { AspidaClient } from 'aspida'
+import { dataToURLString } from 'aspida'
 import type { Methods as Methods0 } from './api/token'
 import type { Methods as Methods1 } from './authorize'
 
@@ -20,11 +21,12 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
       }
     },
     authorize: {
-      get: (option: { body: Methods1['get']['reqBody'], config?: T | undefined }) =>
-        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option, 'URLSearchParams').arrayBuffer(),
-      $get: (option: { body: Methods1['get']['reqBody'], config?: T | undefined }) =>
-        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option, 'URLSearchParams').arrayBuffer().then(r => r.body),
-      $path: () => `${prefix}${PATH1}`
+      get: (option: { query: Methods1['get']['query'], config?: T | undefined }) =>
+        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option).arrayBuffer(),
+      $get: (option: { query: Methods1['get']['query'], config?: T | undefined }) =>
+        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option).arrayBuffer().then(r => r.body),
+      $path: (option?: { method?: 'get' | undefined; query: Methods1['get']['query'] } | undefined) =>
+        `${prefix}${PATH1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     }
   }
 }

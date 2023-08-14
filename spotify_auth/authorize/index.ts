@@ -5,13 +5,13 @@ export type AuthResult = {
 
 export type Methods = {
   get: {
-    reqFormat: URLSearchParams
-    reqBody: {
+    query: {
       client_id: string
       response_type: 'code'
       redirect_uri: string
       state: string
       scope: string
+      show_dialog: false
     }
 
     resBody: ArrayBuffer
