@@ -3,6 +3,8 @@
 import env from 'dotenv'
 import api from '../../spotify_auth/$api'
 import aspida from '@aspida/axios'
+import express from 'express'
+import http from 'http'
 import { AuthResult } from '../../spotify_auth/api/token'
 import { Result } from './result'
 
@@ -56,12 +58,13 @@ const generateString = (length: number) => {
   return chars.join('')
 }
 
+const state = generateString(16)
+
 export const authorize = async (): Promise<Result<string>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
     return { data: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
   }
   const clientId = process.env.SPOTIFY_CLIENT_ID ?? ''
-  const state = generateString(16)
 
   const client = api(aspida())
   try {
@@ -70,7 +73,7 @@ export const authorize = async (): Promise<Result<string>> => {
         client_id: clientId,
         response_type: 'code',
         state: state,
-        redirect_uri: 'http://localhost',
+        redirect_uri: 'http://localhost:3000/callback',
         scope: 'user-read-currently-playing playlist-modify-private',
         show_dialog: false,
       },
@@ -91,3 +94,25 @@ export const authorize = async (): Promise<Result<string>> => {
     return { data: undefined, error: e as Error }
   }
 }
+
+const app = express()
+
+app.get('/callback', (req, res) => {
+  const code = req.query.code || null
+  const s = req.query.state || null
+  if (state !== s) {
+    res.send('state is not matched')
+    res.status(400)
+    return
+  }
+
+  res.status(200)
+  res.send('OK')
+})
+
+const server = http.createServer(app)
+
+const PORT = 3000
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
+})
