@@ -10,7 +10,7 @@ export type Methods = {
   get: {
     query: Types.QueryMarket & {
       q: string
-      type: string
+      type: ('album' | 'artist' | 'playlist' | 'track' | 'show' | 'episode' | 'audiobook')[]
       limit?: number | undefined
       offset?: number | undefined
       include_external?: 'audio' | undefined
@@ -20,13 +20,13 @@ export type Methods = {
 
     /** Search response */
     resBody: {
-      albums: Types.PagingSimplifiedAlbumObject
+      tracks: Types.PagingTrackObject
       artists: Types.PagingArtistObject
-      audiobooks: Types.PagingSimplifiedAudiobookObject
-      episodes: Types.PagingSimplifiedEpisodeObject
+      albums: Types.PagingSimplifiedAlbumObject
       playlists: Types.PagingPlaylistObject
       shows: Types.PagingSimplifiedShowObject
-      tracks: Types.PagingTrackObject
+      episodes: Types.PagingSimplifiedEpisodeObject
+      audiobooks: Types.PagingSimplifiedAudiobookObject
     }
   }
 }

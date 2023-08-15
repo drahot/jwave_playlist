@@ -7,8 +7,7 @@ export type Methods = {
    * _**Note**: Currently doesn't support podcast episodes._
    */
   get: {
-    query?: {
-      limit?: number | undefined
+    query?: Types.QueryLimit & {
       after?: number | undefined
       before?: number | undefined
     } | undefined

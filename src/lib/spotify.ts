@@ -4,9 +4,11 @@ import aspida from '@aspida/axios'
 import * as searchApi from '../../spotify/search/$api'
 import * as usersApi from '../../spotify/users/$api'
 import * as playlistsApi from '../../spotify/playlists/$api'
+import * as meApi from '../../spotify/me/$api'
 
 import { TrackObject } from '../../spotify/@types'
 import { Result } from './result'
+import * as process from 'process'
 
 const userId = process.env.SPOTIFY_USER_ID ?? ''
 
@@ -24,7 +26,7 @@ export const spotify = (accessToken: string) => {
         '%20'
       )
       const data = await client.get({
-        query: { q: query, type: 'track', limit: 50 },
+        query: { q: query, type: ['track'], limit: 50 },
         config: {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -65,49 +67,63 @@ export const spotify = (accessToken: string) => {
       description?: string,
       isPublic = false
     ) => {
-      const client = usersApi.default(aspida())
-      const data = await client._user_id(userId).playlists.post({
-        body: { name, description, public: isPublic },
-        config: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      try {
+        const client = usersApi.default(aspida())
+        const data = await client._user_id(userId).playlists.post({
+          body: { name, description: description ?? '', public: isPublic },
+          config: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        },
-      })
-
-      const { body, status } = data
-
-      if (status !== 201) {
-        return {
-          data: undefined,
-          error: new Error(`create playlist error: statusCode=${status}`),
-        }
+        })
+        const { body } = data
+        return { data: body, error: undefined }
+      } catch (e) {
+        const error = e as Error
+        return { data: undefined, error: error }
       }
-
-      return { data: body, error: undefined }
     },
     //
     addItemsToPlaylist: async (playlistId: string, trackUris: string[]) => {
-      const client = playlistsApi.default(aspida())
-      const data = await client._playlist_id(playlistId).tracks.post({
-        body: { position: 0, uris: trackUris },
-        config: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      try {
+        const client = playlistsApi.default(aspida())
+        const data = await client._playlist_id(playlistId).tracks.post({
+          body: { position: 0, uris: trackUris },
+          config: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        },
-      })
+        })
 
-      const { body, status } = data
+        const { body } = data
+        return { data: body, error: undefined }
+      } catch (e) {
+        const error = e as Error
+        return { data: undefined, error: error }
+      }
+    },
+    me: async () => {
+      const client = meApi.default(aspida())
+      try {
+        const data = await client.get({
+          config: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        })
+        const { body } = data
 
-      if (status !== 201) {
+        return { data: body, error: undefined }
+      } catch (e) {
+        const error = e as Error
         return {
           data: undefined,
-          error: new Error(`add playlist error: statusCode=${status}`),
+          error: error,
         }
       }
-
-      return { data: body, error: undefined }
     },
   }
 }

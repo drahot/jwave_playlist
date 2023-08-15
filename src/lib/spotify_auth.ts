@@ -3,12 +3,17 @@
 import env from 'dotenv'
 import api from '../../spotify_auth/$api'
 import aspida from '@aspida/axios'
-import { AuthResult } from '../../spotify_auth/token'
+import express from 'express'
+import http from 'http'
+import { AuthResult } from '../../spotify_auth/api/token'
 import { Result } from './result'
 
 env.config()
 
-export const authenticate = async (): Promise<Result<AuthResult>> => {
+const app = express()
+
+// noinspection JSUnusedGlobalSymbols
+export const token = async (): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
     return { data: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
   }
@@ -30,18 +35,76 @@ export const authenticate = async (): Promise<Result<AuthResult>> => {
 
   const client = api(aspida())
   try {
-    const { body, status } = await client.token.post({
+    const { body } = await client.api.token.post({
       body: {
         client_id: clientId,
         client_secret: clientSecret,
         grant_type: 'client_credentials',
       },
     })
-    if (status !== 200) {
-      return { data: undefined, error: new Error('auth error') }
-    }
     return { data: body, error: undefined }
-  } catch (error: unknown) {
-    return { data: undefined, error: error as Error }
+  } catch (e) {
+    return { data: undefined, error: e as Error }
   }
 }
+
+const BASE_CHARS =
+  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+const generateString = (length: number) => {
+  const chars = Array.from({ length }, () => {
+    const index = Math.floor(Math.random() * BASE_CHARS.length)
+    return BASE_CHARS[index]
+  })
+
+  return chars.join('')
+}
+
+const state = generateString(16)
+
+export const authorize = async (): Promise<Result<string>> => {
+  if (!process.env.SPOTIFY_CLIENT_ID) {
+    return { data: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
+  }
+  const clientId = process.env.SPOTIFY_CLIENT_ID ?? ''
+
+  const client = api(aspida())
+  try {
+    const { body } = await client.authorize.get({
+      query: {
+        client_id: clientId,
+        response_type: 'code',
+        state: state,
+        redirect_uri: 'http://localhost:3000/callback',
+        scope: 'user-read-currently-playing playlist-modify-private',
+        show_dialog: false,
+      },
+    })
+
+    return { data: body.code, error: undefined }
+  } catch (e) {
+    console.log(e)
+    return { data: undefined, error: e as Error }
+  }
+}
+
+app.get('/callback', (req, res) => {
+  const code = req.query.code || null
+  const s = req.query.state || null
+  if (state !== s) {
+    res.send('state is not matched')
+    res.status(400)
+    return
+  }
+
+  res.status(200)
+  const data = JSON.stringify({ code })
+  res.send(data)
+})
+
+const server = http.createServer(app)
+
+const PORT = 3000
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
+})

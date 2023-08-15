@@ -1,10 +1,5 @@
 /* eslint-disable */
 export type Methods = {
-  /** Remove the current user as a follower of a playlist. */
-  delete: {
-    status: 200
-  }
-
   /** Add the current user as a follower of a playlist. */
   put: {
     status: 200
@@ -14,5 +9,10 @@ export type Methods = {
       public: boolean
       [key: string]: any
     }
+  }
+
+  /** Remove the current user as a follower of a playlist. */
+  delete: {
+    status: 200
   }
 }

@@ -31,18 +31,6 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
         `${prefix}${PATH1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     },
     /**
-     * Remove one or more episodes from the current user's library.<br/>
-     * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
-     */
-    delete: (option: { body: Methods0['delete']['reqBody'], query: Methods0['delete']['query'], config?: T | undefined }) =>
-      fetch<void, BasicHeaders, Methods0['delete']['status']>(prefix, PATH0, DELETE, option).send(),
-    /**
-     * Remove one or more episodes from the current user's library.<br/>
-     * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
-     */
-    $delete: (option: { body: Methods0['delete']['reqBody'], query: Methods0['delete']['query'], config?: T | undefined }) =>
-      fetch<void, BasicHeaders, Methods0['delete']['status']>(prefix, PATH0, DELETE, option).send().then(r => r.body),
-    /**
      * Get a list of the episodes saved in the current Spotify user's library.<br/>
      * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
      * @returns Pages of episodes
@@ -68,7 +56,19 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
      */
     $put: (option: { body: Methods0['put']['reqBody'], query: Methods0['put']['query'], config?: T | undefined }) =>
       fetch<void, BasicHeaders, Methods0['put']['status']>(prefix, PATH0, PUT, option).send().then(r => r.body),
-    $path: (option?: { method: 'delete'; query: Methods0['delete']['query'] } | { method?: 'get' | undefined; query: Methods0['get']['query'] } | { method: 'put'; query: Methods0['put']['query'] } | undefined) =>
+    /**
+     * Remove one or more episodes from the current user's library.<br/>
+     * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
+     */
+    delete: (option: { body: Methods0['delete']['reqBody'], query: Methods0['delete']['query'], config?: T | undefined }) =>
+      fetch<void, BasicHeaders, Methods0['delete']['status']>(prefix, PATH0, DELETE, option).send(),
+    /**
+     * Remove one or more episodes from the current user's library.<br/>
+     * This API endpoint is in __beta__ and could change without warning. Please share any feedback that you have, or issues that you discover, in our [developer community forum](https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer).
+     */
+    $delete: (option: { body: Methods0['delete']['reqBody'], query: Methods0['delete']['query'], config?: T | undefined }) =>
+      fetch<void, BasicHeaders, Methods0['delete']['status']>(prefix, PATH0, DELETE, option).send().then(r => r.body),
+    $path: (option?: { method?: 'get' | undefined; query: Methods0['get']['query'] } | { method: 'put'; query: Methods0['put']['query'] } | { method: 'delete'; query: Methods0['delete']['query'] } | undefined) =>
       `${prefix}${PATH0}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
   }
 }

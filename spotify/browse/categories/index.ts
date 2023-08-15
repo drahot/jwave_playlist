@@ -13,7 +13,9 @@ export type Methods = {
 
     /** A paged set of categories */
     resBody: {
-      categories: Types.PagingObject
+      categories: Types.PagingObject & {
+        items: Types.CategoryObject[]
+      }
     }
   }
 }

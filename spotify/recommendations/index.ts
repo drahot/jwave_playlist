@@ -8,11 +8,11 @@ export type Methods = {
    * For artists and tracks that are very new or obscure there might not be enough data to generate a list of tracks.
    */
   get: {
-    query: Types.QueryMarket & {
+    query?: Types.QueryMarket & {
       limit?: number | undefined
-      seed_artists: string
-      seed_genres: string
-      seed_tracks: string
+      seed_artists?: string | undefined
+      seed_genres?: string | undefined
+      seed_tracks?: string | undefined
       min_acousticness?: number | undefined
       max_acousticness?: number | undefined
       target_acousticness?: number | undefined
@@ -55,7 +55,7 @@ export type Methods = {
       min_valence?: number | undefined
       max_valence?: number | undefined
       target_valence?: number | undefined
-    }
+    } | undefined
 
     status: 200
     /** A set of recommendations */
