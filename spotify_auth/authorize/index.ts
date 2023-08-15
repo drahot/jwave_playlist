@@ -1,6 +1,5 @@
 export type AuthResult = {
   code: string
-  status: string
 }
 
 export type Methods = {
@@ -14,6 +13,6 @@ export type Methods = {
       show_dialog: false
     }
 
-    resBody: ArrayBuffer
+    resBody: AuthResult
   }
 }

@@ -10,6 +10,8 @@ import { Result } from './result'
 
 env.config()
 
+const app = express()
+
 // noinspection JSUnusedGlobalSymbols
 export const token = async (): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
@@ -79,23 +81,12 @@ export const authorize = async (): Promise<Result<string>> => {
       },
     })
 
-    const redirectUri = new TextDecoder().decode(body)
-    const url = new URL(redirectUri)
-    if (state !== url.searchParams.get('state') ?? '') {
-      return {
-        data: undefined,
-        error: new Error('state is not matched'),
-      }
-    }
-    const code = url.searchParams.get('code') ?? ''
-    return { data: code, error: undefined }
+    return { data: body.code, error: undefined }
   } catch (e) {
     console.log(e)
     return { data: undefined, error: e as Error }
   }
 }
-
-const app = express()
 
 app.get('/callback', (req, res) => {
   const code = req.query.code || null
@@ -107,7 +98,8 @@ app.get('/callback', (req, res) => {
   }
 
   res.status(200)
-  res.send('OK')
+  const data = JSON.stringify({ code })
+  res.send(data)
 })
 
 const server = http.createServer(app)

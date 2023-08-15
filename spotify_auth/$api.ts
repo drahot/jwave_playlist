@@ -22,9 +22,9 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
     },
     authorize: {
       get: (option: { query: Methods1['get']['query'], config?: T | undefined }) =>
-        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option).arrayBuffer(),
+        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option).json(),
       $get: (option: { query: Methods1['get']['query'], config?: T | undefined }) =>
-        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option).arrayBuffer().then(r => r.body),
+        fetch<Methods1['get']['resBody']>(prefix, PATH1, GET, option).json().then(r => r.body),
       $path: (option?: { method?: 'get' | undefined; query: Methods1['get']['query'] } | undefined) =>
         `${prefix}${PATH1}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     }
