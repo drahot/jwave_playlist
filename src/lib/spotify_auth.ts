@@ -96,6 +96,9 @@ const token = async (
   }
   const clientId = process.env.SPOTIFY_CLIENT_ID
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
+  const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
+    'base64'
+  )
 
   const client = api(aspida())
   try {
@@ -107,7 +110,7 @@ const token = async (
       },
       config: {
         headers: {
-          Authorization: `Basic ${basicAuth(clientId, clientSecret)}`,
+          Authorization: `Basic ${basicAuth}`,
         },
       },
     })
@@ -115,10 +118,6 @@ const token = async (
   } catch (e) {
     return { data: undefined, error: e as Error }
   }
-}
-
-const basicAuth = (clientId: string, clientSecret: string) => {
-  return Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 }
 
 export const authorize = async (): Promise<Result<AuthResult>> => {
