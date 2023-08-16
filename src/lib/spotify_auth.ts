@@ -28,56 +28,47 @@ const generateString = (length: number) => {
   return chars.join('')
 }
 
+const state = generateString(16)
+
 const loginPage = async () => {
+  const url =
+    'https://accounts.spotify.com/authorize?' +
+    querystring.stringify({
+      response_type: 'code',
+      client_id: process.env.SPOTIFY_CLIENT_ID ?? '',
+      scope: SCOPE,
+      redirect_uri: AUTH_REDIRECT_URL,
+      state: state,
+    })
+
   const browser = await chromium.launch({
     channel: 'chrome',
     headless: true,
   })
   const page = await browser.newPage()
-  await page.goto(`${AUTH_BASE_URL}/login`)
+  await page.goto(url)
   await page.fill('#login-username', process.env.SPOTIFY_USER_NAME ?? '')
   await page.fill('#login-password', process.env.SPOTIFY_USER_PASSWORD ?? '')
   await page.click('#login-button')
   return browser
 }
 
-const loginAction = (app: Express, state: string) => {
-  app.get('/login', (req, res) => {
-    res.redirect(
-      'https://accounts.spotify.com/authorize?' +
-        querystring.stringify({
-          response_type: 'code',
-          client_id: process.env.SPOTIFY_CLIENT_ID ?? '',
-          scope: SCOPE,
-          redirect_uri: AUTH_REDIRECT_URL,
-          state: state,
-        })
-    )
-  })
-}
-
 const callbackAction = (app: Express, state: string) => {
-  let resolve: (code: string) => void
-  let reject: (error: Error) => void
-  const promise = new Promise<string>((_resolve, _reject) => {
-    resolve = _resolve
-    reject = _reject
-  })
+  return new Promise<string>((resolve, reject) => {
+    app.get('/callback', (req, res) => {
+      const code = req.query.code || null
+      const s = req.query.state || null
+      if (state !== s) {
+        reject(new Error('state is not matched'))
+        res.status(400)
+        return
+      }
 
-  app.get('/callback', (req, res) => {
-    const code = req.query.code || null
-    const s = req.query.state || null
-    if (state !== s) {
-      reject(new Error('state is not matched'))
-      res.status(400)
-      return
-    }
-
-    res.status(200)
-    resolve(code as string)
-    res.send('OK')
+      res.status(200)
+      resolve(code as string)
+      res.send('OK')
+    })
   })
-  return promise
 }
 
 // noinspection JSUnusedGlobalSymbols
@@ -136,11 +127,9 @@ export const authorize = async (): Promise<Result<AuthResult>> => {
 
   const app = express()
   const server = http.createServer(app)
-  const state = generateString(16)
 
   try {
     // エンドポイントの作成
-    loginAction(app, state)
     const getResultCode = callbackAction(app, state)
 
     // サーバーの起動
