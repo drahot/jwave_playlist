@@ -82,12 +82,12 @@ const main = async () => {
     process.exit(1)
   }
 
-  // const auth = authResult.data
-  // console.log('auth_token: ', auth.access_token)
-  // console.log('expires_in: ', auth?.expires_in)
+  const auth = authResult.data
+  console.log('auth_token: ', auth?.access_token)
+  console.log('scope: ', auth?.scope)
+  console.log('refresh_token: ', auth?.refresh_token)
+  console.log('expires_in: ', auth?.expires_in)
 
-  const authToken = authResult.data
-  console.log(authToken)
   // const client = spotify(authToken)
   //
   // const songs = await getOnAirList()

@@ -16,7 +16,7 @@ const BASE_URL = process.env.SPOTIFY_AUTH_URL ?? ''
 const PORT = process.env.SPOTIFY_AUTH_URL_PORT ?? ''
 const AUTH_BASE_URL = BASE_URL + (PORT ? `:${PORT}` : '')
 const SCOPE = 'playlist-modify-private'
-
+const AUTH_REDIRECT_URL = `${AUTH_BASE_URL}/callback`
 const BASE_CHARS =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
@@ -49,7 +49,7 @@ const loginAction = (app: Express, state: string) => {
           response_type: 'code',
           client_id: process.env.SPOTIFY_CLIENT_ID ?? '',
           scope: SCOPE,
-          redirect_uri: `${AUTH_BASE_URL}/callback`,
+          redirect_uri: AUTH_REDIRECT_URL,
           state: state,
         })
     )
@@ -81,7 +81,10 @@ const callbackAction = (app: Express, state: string) => {
 }
 
 // noinspection JSUnusedGlobalSymbols
-export const token = async (): Promise<Result<AuthResult>> => {
+const token = async (
+  code: string,
+  redirectUri: string
+): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_CLIENT_ID) {
     return { data: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
   }
@@ -91,13 +94,6 @@ export const token = async (): Promise<Result<AuthResult>> => {
       error: new Error('SPOTIFY_CLIENT_SECRET is not set'),
     }
   }
-  if (!process.env.SPOTIFY_USER_ID) {
-    return {
-      data: undefined,
-      error: new Error('SPOTIFY_USER_ID is not set'),
-    }
-  }
-
   const clientId = process.env.SPOTIFY_CLIENT_ID
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
 
@@ -105,9 +101,14 @@ export const token = async (): Promise<Result<AuthResult>> => {
   try {
     const { body } = await client.api.token.post({
       body: {
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: 'client_credentials',
+        code: code,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      },
+      config: {
+        headers: {
+          Authorization: `Basic ${basicAuth(clientId, clientSecret)}`,
+        },
       },
     })
     return { data: body, error: undefined }
@@ -116,7 +117,11 @@ export const token = async (): Promise<Result<AuthResult>> => {
   }
 }
 
-export const authorize = async (): Promise<Result<string>> => {
+const basicAuth = (clientId: string, clientSecret: string) => {
+  return Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+}
+
+export const authorize = async (): Promise<Result<AuthResult>> => {
   if (!process.env.SPOTIFY_USER_NAME) {
     return {
       data: undefined,
@@ -135,18 +140,24 @@ export const authorize = async (): Promise<Result<string>> => {
   const state = generateString(16)
 
   try {
+    // エンドポイントの作成
     loginAction(app, state)
     const getResultCode = callbackAction(app, state)
+
+    // サーバーの起動
     server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`)
     })
 
+    // ログイン処理
     const browser = await loginPage()
+
+    // Promiseの結果を待つ
     const code = await getResultCode
     await browser.close()
 
-    return { data: code, error: undefined }
-    // return { data: body.code, error: undefined }
+    // codeを使ってtokenを取得
+    return await token(code, AUTH_REDIRECT_URL)
   } catch (e) {
     console.log(e)
     return { data: undefined, error: e as Error }
