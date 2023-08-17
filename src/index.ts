@@ -94,7 +94,7 @@ const main = async () => {
   const trackUris = await searchTracks(client, songs.slice(0, 100))
   const uris = trackUris.filter((uri) => uri !== '')
   console.log(trackUris.length)
-  const playlist = await createPlaylist(client, uris.slice(0, 100))
+  const playlist = await createPlaylist(client, uris)
   console.log(playlist?.external_urls?.spotify)
   process.exit()
 }
