@@ -71,28 +71,38 @@ const callbackAction = (app: Express, state: string) => {
   })
 }
 
+const validateValueSet = (
+  value: string | null | undefined,
+  message: string
+) => {
+  if (!value) {
+    throw new Error(message)
+  }
+}
+
 // noinspection JSUnusedGlobalSymbols
 const token = async (
   code: string,
   redirectUri: string
 ): Promise<Result<AuthResult>> => {
-  if (!process.env.SPOTIFY_CLIENT_ID) {
-    return { data: undefined, error: new Error('SPOTIFY_CLIENT_ID is not set') }
-  }
-  if (!process.env.SPOTIFY_CLIENT_SECRET) {
-    return {
-      data: undefined,
-      error: new Error('SPOTIFY_CLIENT_SECRET is not set'),
-    }
-  }
-  const clientId = process.env.SPOTIFY_CLIENT_ID
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
-  const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
-    'base64'
-  )
-
   const client = api(aspida())
+
   try {
+    validateValueSet(
+      process.env.SPOTIFY_CLIENT_ID,
+      'SPOTIFY_CLIENT_ID is not set'
+    )
+    validateValueSet(
+      process.env.SPOTIFY_CLIENT_SECRET,
+      'SPOTIFY_CLIENT_SECRET is not set'
+    )
+
+    const clientId = process.env.SPOTIFY_CLIENT_ID
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
+    const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
+      'base64'
+    )
+
     const { body } = await client.api.token.post({
       body: {
         code: code,
@@ -112,25 +122,21 @@ const token = async (
 }
 
 export const authorize = async (): Promise<Result<AuthResult>> => {
-  if (!process.env.SPOTIFY_USER_NAME) {
-    return {
-      data: undefined,
-      error: new Error('SPOTIFY_USER_NAME is not set'),
-    }
-  }
-  if (!process.env.SPOTIFY_USER_PASSWORD) {
-    return {
-      data: undefined,
-      error: new Error('SPOTIFY_USER_PASSWORD is not set'),
-    }
-  }
-
   const app = express()
   const server = http.createServer(app)
 
   try {
+    validateValueSet(
+      process.env.SPOTIFY_USER_NAME,
+      'SPOTIFY_USER_NAME is not set'
+    )
+    validateValueSet(
+      process.env.SPOTIFY_USER_PASSWORD,
+      'SPOTIFY_USER_PASSWORD is not set'
+    )
+
     // エンドポイントの作成
-    const getResultCode = callbackAction(app, state)
+    const getCode = callbackAction(app, state)
 
     // サーバーの起動
     server.listen(PORT, () => {
@@ -141,7 +147,7 @@ export const authorize = async (): Promise<Result<AuthResult>> => {
     const browser = await loginPage()
 
     // Promiseの結果を待つ
-    const code = await getResultCode
+    const code = await getCode
     await browser.close()
 
     // codeを使ってtokenを取得
