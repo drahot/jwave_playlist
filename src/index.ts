@@ -1,41 +1,39 @@
 import { authorize } from './lib/spotify_auth'
 import * as process from 'process'
-import { Song } from './lib/jwave'
+import { getOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 
 type spotifyClient = ReturnType<typeof spotify>
 
 const searchTracks = async (client: spotifyClient, songs: Song[]) => {
-  const tracks = songs
-    .map(async (item, i) => {
-      if (i !== 0 && i % 20 === 0) {
-        await sleep(1000)
-      }
-      const searchResult = await client.searchTrack(
-        item.artistName,
-        item.songName
-      )
-      if (searchResult.error) {
-        console.error(searchResult.error.message)
-        return ''
-      }
-      if (!searchResult.data) {
-        return ''
-      }
+  const tracks = songs.map(async (item, i) => {
+    if (i !== 0 && i % 20 === 0) {
+      await sleep(1000)
+    }
+    const searchResult = await client.searchTrack(
+      item.artistName,
+      item.songName
+    )
+    if (searchResult.error) {
+      console.error(searchResult.error.message)
+      return ''
+    }
+    if (!searchResult.data) {
+      return ''
+    }
 
-      const track = searchResult.data[0]
-      if (!track) {
-        return ''
-      }
-      console.debug(track.artists?.[0].name ?? '')
-      console.debug(track.name)
-      console.debug(track.external_urls?.spotify)
-      console.debug(track.uri)
+    const track = searchResult.data[0]
+    if (!track) {
+      return ''
+    }
+    console.debug(track.artists?.[0].name ?? '')
+    console.debug(track.name)
+    console.debug(track.external_urls?.spotify)
+    console.debug(track.uri)
 
-      return track.uri ?? ''
-    })
-    .filter(async (item) => ((await item) ?? '') !== '')
+    return track.uri ?? ''
+  })
   return Promise.all(tracks)
 }
 
@@ -63,6 +61,7 @@ const createPlaylist = async (client: spotifyClient, trackUris: string[]) => {
   const playlist = createResult.data
 
   for (const uris of chunkArray(trackUris, 100)) {
+    console.log(uris)
     await client.addItemsToPlaylist(playlist.id ?? '', uris)
     await sleep(1000)
   }
@@ -88,14 +87,15 @@ const main = async () => {
   console.log('refresh_token: ', auth?.refresh_token)
   console.log('expires_in: ', auth?.expires_in)
 
-  // const client = spotify(authToken)
-  //
-  // const songs = await getOnAirList()
-  //
-  // const trackUris = await searchTracks(client, songs.slice(0, 50))
-  // console.log(trackUris.length)
-  // const playlist = await createPlaylist(client, trackUris)
-  // console.log(playlist?.external_urls?.spotify)
+  const client = spotify(auth?.access_token ?? '')
+
+  const songs = await getOnAirList()
+
+  const trackUris = await searchTracks(client, songs.slice(0, 100))
+  const uris = trackUris.filter((uri) => uri !== '')
+  console.log(trackUris.length)
+  const playlist = await createPlaylist(client, uris.slice(0, 100))
+  console.log(playlist?.external_urls?.spotify)
   process.exit()
 }
 
