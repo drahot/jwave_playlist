@@ -53,8 +53,8 @@ const loginPage = async () => {
   return browser
 }
 
-const callbackAction = (app: Express, state: string) => {
-  return new Promise<string>((resolve, reject) => {
+const callbackAction = (app: Express, state: string) =>
+  new Promise<string>((resolve, reject) => {
     app.get('/callback', (req, res) => {
       const code = req.query.code || null
       const s = req.query.state || null
@@ -69,7 +69,6 @@ const callbackAction = (app: Express, state: string) => {
       res.send('OK')
     })
   })
-}
 
 const validateValueSet = (
   value: string | null | undefined,
