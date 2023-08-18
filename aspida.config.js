@@ -5,7 +5,7 @@ module.exports = [
     baseURL: 'https://api.spotify.com/v1',
     openapi: {
       inputFile:
-        'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/spotify.com/1.0.0/openapi.yaml',
+        'https://raw.githubusercontent.com/sonallux/spotify-web-api/main/fixed-spotify-open-api.yml',
     },
   },
   {
