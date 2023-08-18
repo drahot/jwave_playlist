@@ -1,6 +1,5 @@
 // noinspection JSUnresolvedReference
 
-import env from 'dotenv'
 import api from '../../spotify_auth/$api'
 import aspida from '@aspida/axios'
 import express, { Express } from 'express'
@@ -9,12 +8,14 @@ import { AuthResult } from '../../spotify_auth/api/token'
 import { Result } from './result'
 import * as querystring from 'querystring'
 import { chromium } from 'playwright-core'
+import env from 'dotenv'
 
 env.config()
 
 const BASE_URL = process.env.SPOTIFY_AUTH_URL ?? ''
 const PORT = process.env.SPOTIFY_AUTH_URL_PORT ?? ''
 const AUTH_BASE_URL = BASE_URL + (PORT ? `:${PORT}` : '')
+const SPOTIFY_AUTHORIZE_URL = 'https://accounts.spotify.com/authorize'
 const SCOPE = 'playlist-modify-private'
 const AUTH_REDIRECT_URL = `${AUTH_BASE_URL}/callback`
 const BASE_CHARS =
@@ -32,7 +33,8 @@ const state = generateString(16)
 
 const loginPage = async () => {
   const url =
-    'https://accounts.spotify.com/authorize?' +
+    SPOTIFY_AUTHORIZE_URL +
+    '?' +
     querystring.stringify({
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID ?? '',
