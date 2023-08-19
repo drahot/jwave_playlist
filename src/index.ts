@@ -27,10 +27,10 @@ const searchTracks = async (client: spotifyClient, songs: Song[]) => {
     if (!track) {
       return ''
     }
-    console.debug(track.artists?.[0].name ?? '')
-    console.debug(track.name)
-    console.debug(track.external_urls?.spotify)
-    console.debug(track.uri)
+    console.log(track.artists?.[0].name ?? '')
+    console.log(track.name)
+    console.log(track.external_urls?.spotify)
+    console.log(track.uri)
 
     return track.uri ?? ''
   })
@@ -54,18 +54,17 @@ const createPlaylist = async (client: spotifyClient, trackUris: string[]) => {
 
   const createResult = await client.createPlaylist(jWavePlaylistName)
   if (createResult.error) {
-    console.error(createResult.error.message)
-    return
+    return { data: undefined, error: createResult.error }
   }
 
   const playlist = createResult.data
 
   for (const uris of chunkArray(trackUris, 100)) {
-    console.log(uris)
     await client.addItemsToPlaylist(playlist.id ?? '', uris)
     await sleep(1000)
   }
-  return playlist
+
+  return { data: playlist, error: undefined }
 }
 
 const main = async () => {
@@ -87,15 +86,19 @@ const main = async () => {
   console.log('refresh_token: ', auth?.refresh_token)
   console.log('expires_in: ', auth?.expires_in)
 
-  const client = spotify(auth?.access_token ?? '')
-
   const songs = await getOnAirList()
 
+  const client = spotify(auth?.access_token ?? '')
   const trackUris = await searchTracks(client, songs.slice(0, 100))
   const uris = trackUris.filter((uri) => uri !== '')
   console.log(trackUris.length)
-  const playlist = await createPlaylist(client, uris)
-  console.log(playlist?.external_urls?.spotify)
+  const playlistResult = await createPlaylist(client, uris)
+  if (playlistResult.error) {
+    console.error(playlistResult.error.message)
+    process.exit(1)
+  }
+
+  console.log(playlistResult.data?.external_urls?.spotify)
   process.exit()
 }
 
