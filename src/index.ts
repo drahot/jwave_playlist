@@ -6,9 +6,9 @@ import dayjs from 'dayjs'
 import { Result } from './lib/result'
 import { SimplifiedPlaylistObject } from '../spotify/@types'
 
-type spotifyClient = ReturnType<typeof spotify>
+type SpotifyClient = ReturnType<typeof spotify>
 
-const searchTracks = async (client: spotifyClient, songs: Song[]) => {
+const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
   const tracks = songs
     .map(async (item, i) => {
       if (i !== 0 && i % 20 === 0) {
@@ -43,7 +43,7 @@ const searchTracks = async (client: spotifyClient, songs: Song[]) => {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const createPlaylist = async (client: spotifyClient, playlistName: string) => {
+const createPlaylist = async (client: SpotifyClient, playlistName: string) => {
   const createResult = await client.createPlaylist(playlistName)
   if (createResult.error) {
     return { data: undefined, error: createResult.error }
@@ -52,7 +52,7 @@ const createPlaylist = async (client: spotifyClient, playlistName: string) => {
 }
 
 const getPlaylist = async (
-  client: spotifyClient,
+  client: SpotifyClient,
   playlistName: string,
   offset = 0
 ): Promise<Result<SimplifiedPlaylistObject | undefined>> => {
@@ -73,7 +73,7 @@ const getPlaylist = async (
 }
 
 const getPlaylistTrackUris = async (
-  client: spotifyClient,
+  client: SpotifyClient,
   playlistId: string,
   offset = 0
 ): Promise<Result<string[]>> => {
@@ -104,7 +104,7 @@ const getPlaylistTrackUris = async (
   return { data: playlistTrackUris, error: undefined }
 }
 
-const savePlaylist = async (client: spotifyClient, trackUris: string[]) => {
+const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
   const today = dayjs().format('YYYY-MM-DD')
   const jWavePlaylistName = `J-WAVE On Air ${today}`
 
