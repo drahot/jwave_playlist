@@ -3,6 +3,8 @@ import * as process from 'process'
 import { getOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
+import { Result } from './lib/result'
+import { SimplifiedPlaylistObject } from '../spotify/@types'
 
 type spotifyClient = ReturnType<typeof spotify>
 
@@ -39,34 +41,102 @@ const searchTracks = async (client: spotifyClient, songs: Song[]) => {
   return Promise.all(tracks)
 }
 
-const chunkArray = <T>(array: T[], size: number): T[][] => {
-  const chunks: T[][] = []
-
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size))
-  }
-  return chunks
-}
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const createPlaylist = async (client: spotifyClient, trackUris: string[]) => {
-  const today = dayjs().format('YYYY-MM-DD')
-  const jWavePlaylistName = `J-WAVE On Air ${today}`
-
-  const createResult = await client.createPlaylist(jWavePlaylistName)
+const createPlaylist = async (client: spotifyClient, playlistName: string) => {
+  const createResult = await client.createPlaylist(playlistName)
   if (createResult.error) {
     return { data: undefined, error: createResult.error }
   }
+  return { data: createResult.data.id, error: undefined }
+}
 
-  const playlist = createResult.data
-
-  for (const uris of chunkArray(trackUris, 100)) {
-    await client.addItemsToPlaylist(playlist.id ?? '', uris)
-    await sleep(1000)
+const getPlaylist = async (
+  client: spotifyClient,
+  playlistName: string,
+  offset = 0
+): Promise<Result<SimplifiedPlaylistObject | undefined>> => {
+  const playlistsResult = await client.getUserPlaylists(offset)
+  if (playlistsResult.error) {
+    return { data: undefined, error: playlistsResult.error }
   }
 
-  return { data: playlist, error: undefined }
+  const playlists = playlistsResult.data
+  const playlist = playlists.items?.find((item) => item.name === playlistName)
+  if (playlist) {
+    return { data: playlist, error: undefined }
+  }
+
+  return playlists.next
+    ? getPlaylist(client, playlistName, offset + 50)
+    : { data: undefined, error: undefined }
+}
+
+const getPlaylistTrackUris = async (
+  client: spotifyClient,
+  playlistId: string,
+  offset = 0
+): Promise<Result<string[]>> => {
+  const playlistTracksResult = await client.getPlaylistTracks(
+    playlistId,
+    offset,
+    50
+  )
+
+  if (playlistTracksResult.error) {
+    return { data: undefined, error: playlistTracksResult.error }
+  }
+
+  const tracks =
+    playlistTracksResult.data?.items?.map((item) => item.track?.uri ?? '') ?? []
+
+  const nextResult: Result<string[]> = playlistTracksResult.data?.next
+    ? await getPlaylistTrackUris(client, playlistId, offset + 50)
+    : { data: [], error: undefined }
+
+  if (nextResult.error) {
+    return nextResult
+  }
+
+  const nextTracks = nextResult.data ?? []
+  const playlistTrackUris = [...tracks, ...nextTracks]
+
+  return { data: playlistTrackUris, error: undefined }
+}
+
+const savePlaylist = async (client: spotifyClient, trackUris: string[]) => {
+  const today = dayjs().format('YYYY-MM-DD')
+  const jWavePlaylistName = `J-WAVE On Air ${today}`
+
+  const playlistResult = await getPlaylist(client, jWavePlaylistName)
+  if (playlistResult.error) {
+    return { data: undefined, error: playlistResult.error }
+  }
+
+  const playlistIdResult = playlistResult.data
+    ? { data: playlistResult.data.id, error: undefined }
+    : await createPlaylist(client, jWavePlaylistName)
+
+  if (playlistIdResult.error) {
+    return { data: undefined, error: playlistIdResult.error }
+  }
+
+  const playlistTrackUrisResult = await getPlaylistTrackUris(
+    client,
+    playlistIdResult.data ?? ''
+  )
+
+  if (playlistTrackUrisResult.error) {
+    return { data: undefined, error: playlistTrackUrisResult.error }
+  }
+
+  const filterTrackUris = trackUris.filter(
+    (uri) => !playlistTrackUrisResult.data?.includes(uri)
+  )
+
+  await client.addItemsToPlaylist(playlistIdResult.data ?? '', filterTrackUris)
+
+  return playlistIdResult
 }
 
 const main = async () => {
@@ -93,14 +163,14 @@ const main = async () => {
   const client = spotify(auth?.access_token ?? '')
   const trackUris = await searchTracks(client, songs.slice(0, 100))
 
-  const playlistResult = await createPlaylist(client, trackUris)
+  const createPlaylistResult = await savePlaylist(client, trackUris)
 
-  if (playlistResult.error) {
-    console.error(playlistResult.error.message)
+  if (createPlaylistResult.error) {
+    console.error(createPlaylistResult.error.message)
     process.exit(1)
   }
 
-  console.log(playlistResult.data?.external_urls?.spotify)
+  console.log(createPlaylistResult.data)
   process.exit()
 }
 
