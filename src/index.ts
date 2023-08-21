@@ -9,35 +9,33 @@ import { SimplifiedPlaylistObject } from '../spotify/@types'
 type SpotifyClient = ReturnType<typeof spotify>
 
 const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
-  const tracks = songs
-    .map(async (item, i) => {
-      if (i !== 0 && i % 20 === 0) {
-        await sleep(1000)
-      }
-      const searchResult = await client.searchTrack(
-        item.artistName,
-        item.songName
-      )
-      if (searchResult.error) {
-        console.error(searchResult.error.message)
-        return ''
-      }
-      if (!searchResult.data) {
-        return ''
-      }
+  const tracks = songs.map(async (item, i) => {
+    if (i !== 0 && i % 20 === 0) {
+      await sleep(1000)
+    }
+    const searchResult = await client.searchTrack(
+      item.artistName,
+      item.songName
+    )
+    if (searchResult.error) {
+      console.error(searchResult.error.message)
+      return ''
+    }
+    if (!searchResult.data) {
+      return ''
+    }
 
-      const track = searchResult.data[0]
-      if (!track) {
-        return ''
-      }
-      console.log(track.artists?.[0].name ?? '')
-      console.log(track.name)
-      console.log(track.external_urls?.spotify)
-      console.log(track.uri)
+    const track = searchResult.data[0]
+    if (!track) {
+      return ''
+    }
+    console.log(track.artists?.[0].name ?? '')
+    console.log(track.name)
+    console.log(track.external_urls?.spotify)
+    console.log(track.uri)
 
-      return track.uri ?? ''
-    })
-    .filter(async (uri) => (await uri) !== '')
+    return track.uri ?? ''
+  })
   return Promise.all(tracks)
 }
 
@@ -131,7 +129,7 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
   }
 
   const filterTrackUris = trackUris.filter(
-    (uri) => !playlistTrackUrisResult.data?.includes(uri)
+    (uri) => !playlistTrackUrisResult.data?.includes(uri) && uri !== ''
   )
 
   await client.addItemsToPlaylist(playlistIdResult.data ?? '', filterTrackUris)
@@ -162,8 +160,10 @@ const main = async () => {
 
   const client = spotify(auth?.access_token ?? '')
   const trackUris = await searchTracks(client, songs.slice(0, 100))
+  const uris = trackUris.filter((uri) => uri !== '')
 
-  const createPlaylistResult = await savePlaylist(client, trackUris)
+  console.log('uris.length: ', uris.length)
+  const createPlaylistResult = await savePlaylist(client, uris)
 
   if (createPlaylistResult.error) {
     console.error(createPlaylistResult.error.message)
