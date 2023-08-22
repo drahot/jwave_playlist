@@ -110,6 +110,7 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
   if (playlistResult.error) {
     return { data: undefined, error: playlistResult.error }
   }
+  console.log(playlistResult.data)
 
   const playlistIdResult = playlistResult.data
     ? { data: playlistResult.data.id, error: undefined }
