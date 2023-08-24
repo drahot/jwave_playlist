@@ -25,17 +25,22 @@ export const spotify = (accessToken: string) => {
     },
   }
 
-  const errorResult = (e: unknown) => ({ data: undefined, error: e as Error })
+  const getResult = <T>(callback: () => Promise<Result<T>>) => {
+    try {
+      return callback()
+    } catch (e) {
+      return { data: undefined, error: e as Error }
+    }
+  }
 
   return {
     // トラックを検索する
     searchTrack: async (
       artist: string,
       song: string
-    ): Promise<Result<TrackObject[]>> => {
-      const client = searchApi.default(aspida())
-
-      try {
+    ): Promise<Result<TrackObject[]>> =>
+      getResult(async () => {
+        const client = searchApi.default(aspida())
         const query = `remaster track:${song} artist:${artist}`.replace(
           / /g,
           '%20'
@@ -67,36 +72,29 @@ export const spotify = (accessToken: string) => {
           }) ?? []
 
         return { data: tracks, error: undefined }
-      } catch (e) {
-        return errorResult(e)
-      }
-    },
+      }),
     // プレイリストを作成する
     createPlaylist: async (
       name: string,
       description?: string,
       isPublic = false
-    ): Promise<Result<PlaylistObject>> => {
-      const client = usersApi.default(aspida())
-      try {
+    ): Promise<Result<PlaylistObject>> =>
+      getResult(async () => {
+        const client = usersApi.default(aspida())
         const data = await client._user_id(userId).playlists.post({
           body: { name, description: description ?? '', public: isPublic },
           config: config,
         })
         const { body } = data
-
         return { data: body, error: undefined }
-      } catch (e) {
-        return errorResult(e)
-      }
-    },
+      }),
     // カレントユーザーのプレイリストを取得する
     getUserPlaylists: async (
       offset = 0,
       limit = 50
-    ): Promise<Result<PagingPlaylistObject>> => {
-      const client = usersApi.default(aspida())
-      try {
+    ): Promise<Result<PagingPlaylistObject>> =>
+      getResult(async () => {
+        const client = usersApi.default(aspida())
         const data = await client._user_id(userId).playlists.get({
           query: { offset, limit },
           config: config,
@@ -104,17 +102,14 @@ export const spotify = (accessToken: string) => {
         const { body } = data
 
         return { data: body, error: undefined }
-      } catch (e) {
-        return errorResult(e)
-      }
-    },
+      }),
     getPlaylistTracks: async (
       playlistId: string,
       offset = 0,
       limit = 50
-    ): Promise<Result<PagingPlaylistTrackObject>> => {
-      const client = playlistsApi.default(aspida())
-      try {
+    ): Promise<Result<PagingPlaylistTrackObject>> =>
+      getResult(async () => {
+        const client = playlistsApi.default(aspida())
         const data = await client._playlist_id(playlistId).tracks.get({
           query: { offset, limit },
           config: config,
@@ -122,16 +117,13 @@ export const spotify = (accessToken: string) => {
         const { body } = data
 
         return { data: body, error: undefined }
-      } catch (e) {
-        return errorResult(e)
-      }
-    },
+      }),
     // プレイリストに曲を追加
     addItemsToPlaylist: async (
       playlistId: string,
       trackUris: string[]
-    ): Promise<Result<{ snapshot_id: string }>> => {
-      try {
+    ): Promise<Result<{ snapshot_id: string }>> =>
+      getResult(async () => {
         const client = playlistsApi.default(aspida())
         const data = await client._playlist_id(playlistId).tracks.post({
           body: { position: 0, uris: trackUris },
@@ -140,23 +132,17 @@ export const spotify = (accessToken: string) => {
         const { body } = data
 
         return { data: body, error: undefined }
-      } catch (e) {
-        return errorResult(e)
-      }
-    },
+      }),
     // meを取得する
-    me: async (): Promise<Result<PrivateUserObject>> => {
-      const client = meApi.default(aspida())
-      try {
+    me: async (): Promise<Result<PrivateUserObject>> =>
+      getResult(async () => {
+        const client = meApi.default(aspida())
         const data = await client.get({
           config: config,
         })
         const { body } = data
 
         return { data: body, error: undefined }
-      } catch (e) {
-        return errorResult(e)
-      }
-    },
+      }),
   }
 }
