@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { authorize } from './lib/spotify_auth'
 import * as process from 'process'
 import { getOnAirList, Song } from './lib/jwave'
@@ -25,10 +26,10 @@ const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
 
     const track = searchResult.data[0]
 
-    console.log(track.artists?.[0].name ?? '')
-    console.log(track.name)
-    console.log(track.external_urls?.spotify)
-    console.log(track.uri)
+    console.debug(track.artists?.[0].name ?? '')
+    console.debug(track.name)
+    console.debug(track.external_urls?.spotify)
+    console.debug(track.uri)
 
     return { data: track.uri ?? '', error: undefined }
   })
@@ -51,7 +52,12 @@ const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
   return uris
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms: number) =>
+  new Promise((resolve: any) => {
+    setTimeout(() => {
+      resolve()
+    }, ms)
+  })
 
 const createPlaylist = async (client: SpotifyClient, playlistName: string) => {
   const createResult = await client.createPlaylist(playlistName)
