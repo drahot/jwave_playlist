@@ -13,30 +13,42 @@ const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
     if (i !== 0 && i % 20 === 0) {
       await sleep(1000)
     }
+
     const searchResult = await client.searchTrack(
       item.artistName,
       item.songName
     )
+
     if (searchResult.error) {
-      console.error(searchResult.error.message)
-      return ''
-    }
-    if (!searchResult.data) {
-      return ''
+      return searchResult
     }
 
     const track = searchResult.data[0]
-    if (!track) {
-      return ''
-    }
+
     console.log(track.artists?.[0].name ?? '')
     console.log(track.name)
     console.log(track.external_urls?.spotify)
     console.log(track.uri)
 
-    return track.uri ?? ''
+    return { data: track.uri ?? '', error: undefined }
   })
-  return Promise.all(tracks)
+
+  const result = await Promise.all(tracks)
+
+  const [uris, errors] = result.reduce<[string[], Error[]]>(
+    ([uris, errors], result) => {
+      return result.error
+        ? [uris, [...errors, result.error]]
+        : [[...uris, result.data], errors]
+    },
+    [[], []]
+  )
+
+  if (errors.length > 0) {
+    console.error(errors.map((error) => error.message).join('\n'))
+  }
+
+  return uris
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -140,31 +152,25 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
 
 const main = async () => {
   const authResult = await authorize()
-
   if (authResult.error) {
     console.error(authResult.error.message)
     process.exit(1)
   }
 
-  if (!authResult.data) {
-    console.error('authResult.auth is undefined')
-    process.exit(1)
-  }
-
   const auth = authResult.data
-  console.log('auth_token: ', auth?.access_token)
-  console.log('scope: ', auth?.scope)
-  console.log('refresh_token: ', auth?.refresh_token)
-  console.log('expires_in: ', auth?.expires_in)
-
-  const songs = await getOnAirList()
+  console.debug('auth_token: ', auth?.access_token)
 
   const client = spotify(auth?.access_token ?? '')
+  const songs = await getOnAirList()
   const trackUris = await searchTracks(client, songs.slice(0, 100))
-  const uris = trackUris.filter((uri) => uri !== '')
 
-  console.log('uris.length: ', uris.length)
-  const createPlaylistResult = await savePlaylist(client, uris)
+  if (trackUris.length === 0) {
+    console.log('no tracks')
+    process.exit()
+  }
+
+  console.log('uris.length: ', trackUris.length)
+  const createPlaylistResult = await savePlaylist(client, trackUris)
 
   if (createPlaylistResult.error) {
     console.error(createPlaylistResult.error.message)
