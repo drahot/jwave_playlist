@@ -33,6 +33,26 @@ export const spotify = (accessToken: string) => {
     }
   }
 
+  const partialMatch = (artistName: string, artist: string) => {
+    const matchLength = Math.round(artist.length * 0.8)
+    const partialArtistName = artistName.slice(0, matchLength)
+    return artistName.startsWith(partialArtistName)
+  }
+
+  const splitMatch = (artistName: string, artist: string) => {
+    const splitCharacters = ['/', 'feat', 'with', '&', 'and']
+    for (const character of splitCharacters) {
+      if (artist.includes(character)) {
+        const [name] = artist.split(character)
+        const result = artistName === name
+        if (result) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   return {
     // トラックを検索する
     searchTrack: async (
@@ -61,10 +81,11 @@ export const spotify = (accessToken: string) => {
           const artistName = item.album?.artists[0].name?.toLowerCase() ?? ''
 
           if (artistName !== artist.toLowerCase()) {
-            // 80% of artist name should match
-            const matchLength = Math.round(artist.length * 0.8)
-            const partialArtistName = artistName.slice(0, matchLength)
-            if (!artistName.startsWith(partialArtistName)) {
+            if (
+              // 80% of artist name should match
+              !partialMatch(artistName, artist) &&
+              !splitMatch(artistName, artist)
+            ) {
               return false
             }
           }
