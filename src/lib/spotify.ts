@@ -44,7 +44,7 @@ export const spotify = (accessToken: string) => {
     for (const character of splitCharacters) {
       if (artist.includes(character)) {
         const [name] = artist.split(character)
-        const result = artistName === name
+        const result = artistName === name.trim()
         if (result) {
           return true
         }
@@ -79,12 +79,12 @@ export const spotify = (accessToken: string) => {
           }
 
           const artistName = item.album?.artists[0].name?.toLowerCase() ?? ''
-
-          if (artistName !== artist.toLowerCase()) {
+          const a = artist.toLowerCase()
+          if (artistName !== a) {
             if (
               // 80% of artist name should match
-              !partialMatch(artistName, artist) &&
-              !splitMatch(artistName, artist)
+              !partialMatch(artistName, a) &&
+              !splitMatch(artistName, a)
             ) {
               return false
             }
