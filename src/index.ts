@@ -65,9 +65,9 @@ const getPlaylist = async (
     return { data: playlist, error: undefined }
   }
 
-  return playlists.next
-    ? getPlaylist(client, playlistName, offset + 50)
-    : { data: undefined, error: undefined }
+  return !playlists.next
+    ? { data: undefined, error: undefined }
+    : getPlaylist(client, playlistName, offset + 50)
 }
 
 const getPlaylistTrackUris = async (
@@ -88,9 +88,9 @@ const getPlaylistTrackUris = async (
   const tracks =
     playlistTracksResult.data?.items?.map((item) => item.track?.uri ?? '') ?? []
 
-  const nextResult: Result<string[]> = playlistTracksResult.data?.next
-    ? await getPlaylistTrackUris(client, playlistId, offset + 50)
-    : { data: [], error: undefined }
+  const nextResult: Result<string[]> = !playlistTracksResult.data?.next
+    ? { data: [], error: undefined }
+    : await getPlaylistTrackUris(client, playlistId, offset + 50)
 
   if (nextResult.error) {
     return nextResult
