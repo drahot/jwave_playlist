@@ -24,6 +24,15 @@ const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
       return searchResult
     }
 
+    if (!searchResult.data || searchResult.data.length === 0) {
+      return {
+        data: undefined,
+        error: new Error(
+          `artist: ${item.artistName} song: ${item.songName}, no data`
+        ),
+      }
+    }
+
     const track = searchResult.data[0]
 
     console.debug(track.artists?.[0].name ?? '')
