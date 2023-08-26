@@ -41,6 +41,7 @@ export const spotify = (accessToken: string) => {
     ): Promise<Result<TrackObject[]>> =>
       getResult(async () => {
         const client = searchApi.default(aspida())
+
         const query = `remaster track:${song} artist:${artist}`.replace(
           / /g,
           '%20'
@@ -52,26 +53,26 @@ export const spotify = (accessToken: string) => {
 
         const { body } = data
 
-        const tracks =
-          body.tracks.items?.filter((item) => {
-            if ((item.album?.artists.length ?? 0) === 0) {
+        const tracks = body.tracks.items?.filter((item) => {
+          if ((item.album?.artists.length ?? 0) === 0) {
+            return false
+          }
+
+          const artistName = item.album?.artists[0].name?.toLowerCase() ?? ''
+
+          if (artistName !== artist.toLowerCase()) {
+            // 80% of artist name should match
+            const matchLength = Math.round(artist.length * 0.8)
+            const partialArtistName = artistName.slice(0, matchLength)
+            if (!artistName.startsWith(partialArtistName)) {
               return false
             }
+          }
 
-            const artistName = item.album?.artists[0].name?.toLowerCase() ?? ''
-            if (artistName !== artist.toLowerCase()) {
-              // 80% of artist name should match
-              const matchLength = Math.round(artist.length * 0.8)
-              const partialArtistName = artistName.slice(0, matchLength)
-              if (!artistName.startsWith(partialArtistName)) {
-                return false
-              }
-            }
+          return song.toLowerCase() === item.name?.toLowerCase()
+        })
 
-            return song.toLowerCase() === item.name?.toLowerCase()
-          }) ?? []
-
-        return { data: tracks, error: undefined }
+        return { data: tracks ?? [], error: undefined }
       }),
     // プレイリストを作成する
     createPlaylist: async (
