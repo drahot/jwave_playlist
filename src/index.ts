@@ -11,8 +11,9 @@ type SpotifyClient = ReturnType<typeof spotify>
 
 const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
   const tracks = songs.map(async (item, i) => {
-    if (i !== 0 && i % 20 === 0) {
-      await sleep(1000)
+    if (i !== 0 && i % 40 === 0) {
+      // Rate Limit 40 requests per 30 seconds
+      await sleep(30000)
     }
 
     const searchResult = await client.searchTrack(
