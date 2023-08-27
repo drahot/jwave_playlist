@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { authorize } from './lib/spotify_auth'
+import { authorize } from './lib/spotifyAuth'
 import * as process from 'process'
 import { getOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
