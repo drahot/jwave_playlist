@@ -16,7 +16,8 @@ const BASE_URL = process.env.SPOTIFY_AUTH_URL ?? ''
 const PORT = process.env.SPOTIFY_AUTH_URL_PORT ?? ''
 const AUTH_BASE_URL = BASE_URL + (PORT ? `:${PORT}` : '')
 const SPOTIFY_AUTHORIZE_URL = 'https://accounts.spotify.com/authorize'
-const SCOPE = 'playlist-read-private, playlist-modify-private'
+const SCOPE =
+  'playlist-read-private playlist-modify-private playlist-modify-public'
 const AUTH_REDIRECT_URL = `${AUTH_BASE_URL}/callback`
 const BASE_CHARS =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -51,7 +52,16 @@ const loginPage = async () => {
   await page.goto(url)
   await page.fill('#login-username', process.env.SPOTIFY_USER_NAME ?? '')
   await page.fill('#login-password', process.env.SPOTIFY_USER_PASSWORD ?? '')
-  await page.click('#login-button')
+  await page.locator('#login-button').click()
+  await page.waitForTimeout(1000)
+  const [locator] = await Promise.all([page.locator('button')])
+  const buttons = await locator.all()
+  for (const button of buttons) {
+    const testId = await button.getAttribute('data-testid')
+    if (testId === 'auth-accept') {
+      await button.click()
+    }
+  }
   return browser
 }
 
