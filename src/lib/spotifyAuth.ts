@@ -5,10 +5,10 @@ import aspida from '@aspida/axios'
 import express, { Express } from 'express'
 import http from 'http'
 import { AuthResult } from '../../spotify_auth/api/token'
-import { Result } from './result'
 import * as querystring from 'querystring'
 import { chromium } from 'playwright-core'
 import env from 'dotenv'
+import { Err, Ok, Result } from 'ts-results'
 
 env.config()
 
@@ -95,7 +95,7 @@ const validateValueSet = (
 const token = async (
   code: string,
   redirectUri: string
-): Promise<Result<AuthResult>> => {
+): Promise<Result<AuthResult, Error>> => {
   const client = api(aspida())
 
   try {
@@ -126,13 +126,13 @@ const token = async (
         },
       },
     })
-    return { data: body, error: undefined }
+    return Ok(body)
   } catch (e) {
-    return { data: undefined, error: e as Error }
+    return Err(e as Error)
   }
 }
 
-export const authorize = async (): Promise<Result<AuthResult>> => {
+export const authorize = async (): Promise<Result<AuthResult, Error>> => {
   const app = express()
   const server = http.createServer(app)
 
@@ -165,7 +165,7 @@ export const authorize = async (): Promise<Result<AuthResult>> => {
     return await token(code, AUTH_REDIRECT_URL)
   } catch (e) {
     console.log(e)
-    return { data: undefined, error: e as Error }
+    return Err(e as Error)
   } finally {
     server.close()
   }

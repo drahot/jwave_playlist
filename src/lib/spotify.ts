@@ -13,7 +13,8 @@ import {
   PrivateUserObject,
   TrackObject,
 } from '../../spotify/@types'
-import { Result } from './result'
+// import { Result } from './result'
+import { Err, Ok, Result } from 'ts-results'
 import * as process from 'process'
 
 const userId = process.env.SPOTIFY_USER_ID ?? ''
@@ -25,13 +26,10 @@ export const spotify = (accessToken: string) => {
     },
   }
 
-  const getResult = <T>(callback: () => Promise<Result<T>>) => {
-    try {
-      return callback()
-    } catch (e) {
-      return { data: undefined, error: e as Error }
-    }
-  }
+  const getResult = <T>(callback: () => Promise<T>) =>
+    callback()
+      .then((data) => Ok(data))
+      .catch((e) => Err(e))
 
   const partialMatch = (artistName: string, artist: string) => {
     const matchLength = Math.round(artist.length * 0.8)
@@ -58,7 +56,7 @@ export const spotify = (accessToken: string) => {
     searchTrack: async (
       artist: string,
       song: string
-    ): Promise<Result<TrackObject[]>> =>
+    ): Promise<Result<TrackObject[], Error>> =>
       getResult(async () => {
         const client = searchApi.default(aspida())
 
@@ -93,14 +91,14 @@ export const spotify = (accessToken: string) => {
           return song.toLowerCase() === item.name?.toLowerCase()
         })
 
-        return { data: tracks ?? [], error: undefined }
+        return tracks ?? []
       }),
     // プレイリストを作成する
     createPlaylist: async (
       name: string,
       description?: string,
       isPublic = false
-    ): Promise<Result<PlaylistObject>> =>
+    ): Promise<Result<PlaylistObject, Error>> =>
       getResult(async () => {
         const client = usersApi.default(aspida())
         const data = await client._user_id(userId).playlists.post({
@@ -108,13 +106,13 @@ export const spotify = (accessToken: string) => {
           config: config,
         })
         const { body } = data
-        return { data: body, error: undefined }
+        return body
       }),
     // カレントユーザーのプレイリストを取得する
     getUserPlaylists: async (
       offset = 0,
       limit = 50
-    ): Promise<Result<PagingPlaylistObject>> =>
+    ): Promise<Result<PagingPlaylistObject, Error>> =>
       getResult(async () => {
         const client = usersApi.default(aspida())
         const data = await client._user_id(userId).playlists.get({
@@ -123,13 +121,13 @@ export const spotify = (accessToken: string) => {
         })
         const { body } = data
 
-        return { data: body, error: undefined }
+        return body
       }),
     getPlaylistTracks: async (
       playlistId: string,
       offset = 0,
       limit = 50
-    ): Promise<Result<PagingPlaylistTrackObject>> =>
+    ): Promise<Result<PagingPlaylistTrackObject, Error>> =>
       getResult(async () => {
         const client = playlistsApi.default(aspida())
         const data = await client._playlist_id(playlistId).tracks.get({
@@ -138,13 +136,13 @@ export const spotify = (accessToken: string) => {
         })
         const { body } = data
 
-        return { data: body, error: undefined }
+        return body
       }),
     // プレイリストに曲を追加
     addItemsToPlaylist: async (
       playlistId: string,
       trackUris: string[]
-    ): Promise<Result<{ snapshot_id: string }>> =>
+    ): Promise<Result<{ snapshot_id: string }, Error>> =>
       getResult(async () => {
         const client = playlistsApi.default(aspida())
         const data = await client._playlist_id(playlistId).tracks.post({
@@ -153,10 +151,10 @@ export const spotify = (accessToken: string) => {
         })
         const { body } = data
 
-        return { data: body, error: undefined }
+        return body
       }),
     // meを取得する
-    me: async (): Promise<Result<PrivateUserObject>> =>
+    me: async (): Promise<Result<PrivateUserObject, Error>> =>
       getResult(async () => {
         const client = meApi.default(aspida())
         const data = await client.get({
@@ -164,7 +162,7 @@ export const spotify = (accessToken: string) => {
         })
         const { body } = data
 
-        return { data: body, error: undefined }
+        return body
       }),
   }
 }
