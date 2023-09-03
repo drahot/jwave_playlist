@@ -195,4 +195,4 @@ const main = async () => {
   process.exit()
 }
 
-main().then(console.log).then(console.error)
+main().then(console.log).catch(console.error)
