@@ -18,8 +18,9 @@
     "./.eslintrc.js"
   ],
   "dependencies": {
-    "@aspida/axios": "^1.12.0",
-    "axios": "^1.4.0",
+    "@aspida/axios": "^1.14.0",
+    "aspida": "^1.14.0",
+    "axios": "^1.5.0",
     "dayjs": "^1.11.9",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
