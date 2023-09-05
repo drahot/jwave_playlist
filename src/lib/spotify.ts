@@ -13,6 +13,7 @@ import {
   PrivateUserObject,
   TrackObject,
 } from '../../spotify/@types'
+// import { Result } from './result'
 import { Err, Ok, Result } from 'ts-results'
 import * as process from 'process'
 
@@ -68,7 +69,9 @@ export const spotify = (accessToken: string) => {
           config: config,
         })
 
-        const tracks = data.body.tracks.items?.filter((item) => {
+        const { body } = data
+
+        const tracks = body.tracks.items?.filter((item) => {
           if ((item.album?.artists.length ?? 0) === 0) {
             return false
           }
@@ -102,7 +105,8 @@ export const spotify = (accessToken: string) => {
           body: { name, description: description ?? '', public: isPublic },
           config: config,
         })
-        return data.body
+        const { body } = data
+        return body
       }),
     // カレントユーザーのプレイリストを取得する
     getUserPlaylists: async (
@@ -115,7 +119,9 @@ export const spotify = (accessToken: string) => {
           query: { offset, limit },
           config: config,
         })
-        return data.body
+        const { body } = data
+
+        return body
       }),
     getPlaylistTracks: async (
       playlistId: string,
@@ -128,7 +134,9 @@ export const spotify = (accessToken: string) => {
           query: { offset, limit },
           config: config,
         })
-        return data.body
+        const { body } = data
+
+        return body
       }),
     // プレイリストに曲を追加
     addItemsToPlaylist: async (
@@ -141,7 +149,9 @@ export const spotify = (accessToken: string) => {
           body: { position: 0, uris: trackUris },
           config: config,
         })
-        return data.body
+        const { body } = data
+
+        return body
       }),
     // meを取得する
     me: async (): Promise<Result<PrivateUserObject, Error>> =>
@@ -150,7 +160,9 @@ export const spotify = (accessToken: string) => {
         const data = await client.get({
           config: config,
         })
-        return data.body
+        const { body } = data
+
+        return body
       }),
   }
 }
