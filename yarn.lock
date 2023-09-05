@@ -2127,6 +2127,11 @@ typed-array-length@^1.0.4:
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
 
+typesafe-utils@^1.16.2:
+  version "1.16.2"
+  resolved "https://registry.yarnpkg.com/typesafe-utils/-/typesafe-utils-1.16.2.tgz#ba3647f005eabb4f037995e7b4e706ab15af6544"
+  integrity sha512-5Ej1sd5V541LPxlJEs4JKpsmF0zvMcwakXJ/s2N9SpdYAEr6CQcgr2COF350nxaO1FSbHYfL+tEKBcMcLDrdOQ==
+
 typescript@*:
   version "5.1.6"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.6.tgz#02f8ac202b6dad2c0dd5e0913745b47a37998274"
