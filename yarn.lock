@@ -1913,6 +1913,11 @@ resolve@^1.22.1, resolve@^1.22.4:
     path-parse "^1.0.7"
     supports-preserve-symlinks-flag "^1.0.0"
 
+result-type-ts@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/result-type-ts/-/result-type-ts-2.1.1.tgz#15b345396baae9e816bbf48dd151a78d11774c44"
+  integrity sha512-WinT26V3bHBRxjLcjkv1R+xZjzUTNhSu3oQMxp4SGtC7gLSW2MPKyfoBtlVlv1EJ8rFZqS1Hkz1g3rpZCFb98A==
+
 reusify@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/reusify/-/reusify-1.0.4.tgz#90da382b1e126efc02146e90845a88db12925d76"
