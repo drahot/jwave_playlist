@@ -9,7 +9,7 @@ module.exports = [
     },
   },
   {
-    input: 'spotify_auth',
+    input: 'spotify-auth',
     outputEachDir: true,
     baseURL: 'https://accounts.spotify.com',
   },

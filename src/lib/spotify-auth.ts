@@ -1,10 +1,10 @@
 // noinspection JSUnresolvedReference
 
-import api from '../../spotify_auth/$api'
+import api from '../../spotify-auth/$api'
 import aspida from '@aspida/axios'
 import express, { Express } from 'express'
 import http from 'http'
-import { AuthResult } from '../../spotify_auth/api/token'
+import { AuthResult } from '../../spotify-auth/api/token'
 import * as querystring from 'querystring'
 import { chromium } from 'playwright-core'
 import env from 'dotenv'
