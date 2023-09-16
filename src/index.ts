@@ -176,12 +176,12 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
 
 const main = async () => {
   const authResult = await authorize()
-  if (authResult.err) {
-    console.error(authResult.val.message)
+  if (authResult.isFailure) {
+    console.error(authResult.error.message)
     process.exit(1)
   }
 
-  const auth = authResult.val
+  const auth = authResult.value
   console.debug('auth_token: ', auth?.access_token)
 
   const client = spotify(auth?.access_token ?? '')
