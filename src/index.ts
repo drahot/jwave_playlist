@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { authorize } from './lib/spotify-auth'
-import * as process from 'process'
 import { getOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
@@ -176,33 +175,36 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
 
 const main = async () => {
   const authResult = await authorize()
-  if (authResult.isFailure) {
-    console.error(authResult.error.message)
-    process.exit(1)
-  }
 
-  const auth = authResult.value
-  console.debug('auth_token: ', auth?.access_token)
+  await authResult.match(
+    async (auth) => {
+      console.debug('auth_token: ', auth?.access_token)
 
-  const client = spotify(auth?.access_token ?? '')
-  const songs = await getOnAirList()
-  const trackUris = await searchTracks(client, songs.slice(0, 100))
+      const client = spotify(auth?.access_token ?? '')
+      const songs = await getOnAirList()
+      const trackUris = await searchTracks(client, songs.slice(0, 100))
 
-  if (trackUris.length === 0) {
-    console.log('no tracks')
-    process.exit()
-  }
+      if (trackUris.length === 0) {
+        console.log('no tracks')
+        return
+      }
 
-  console.log('uris.length: ', trackUris.length)
-  const createPlaylistResult = await savePlaylist(client, trackUris)
+      console.log('uris.length: ', trackUris.length)
 
-  if (createPlaylistResult.isFailure) {
-    console.error(createPlaylistResult.error.message)
-    process.exit(1)
-  }
-
-  console.log(createPlaylistResult.value)
-  process.exit()
+      const saveResult = await savePlaylist(client, trackUris)
+      saveResult.match(
+        (value) => {
+          console.log(value)
+        },
+        (error) => {
+          console.error(error.message)
+        }
+      )
+    },
+    (error) => {
+      console.error(error.message)
+    }
+  )
 }
 
 main().then(console.log).catch(console.error)
