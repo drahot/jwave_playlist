@@ -5,48 +5,55 @@ import { getOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 import { SimplifiedPlaylistObject } from '../spotify/@types'
-import { Err, Ok, Result } from 'ts-results'
+import { Result } from 'result-type-ts'
+// import { Err, Ok, Result } from 'ts-results'
 
 type SpotifyClient = ReturnType<typeof spotify>
 
 const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
-  const tracks = songs.map(async (item, i) => {
-    if (i !== 0 && i % 30 === 0) {
-      // Rate Limit 30 requests per 30 seconds
-      await sleep(30000)
-    }
+  const tracks: Promise<Result<string, Error>>[] = songs.map(
+    async (item, i) => {
+      if (i !== 0 && i % 30 === 0) {
+        // Rate Limit 30 requests per 30 seconds
+        await sleep(30000)
+      }
 
-    const searchResult = await client.searchTrack(
-      item.artistName,
-      item.songName
-    )
-
-    if (searchResult.err) {
-      return searchResult
-    }
-
-    if (searchResult.val.length === 0) {
-      return Err(
-        new Error(`artist: ${item.artistName} song: ${item.songName}, no data`)
+      const searchResult = await client.searchTrack(
+        item.artistName,
+        item.songName
       )
+
+      if (searchResult.isFailure) {
+        return searchResult
+      }
+
+      const tracks = searchResult.value
+      if (tracks.length === 0) {
+        return Result.failure(
+          new Error(
+            `artist: ${item.artistName} song: ${item.songName}, no data`
+          )
+        )
+      }
+      const track = tracks[0]
+
+      console.debug(track.artists?.[0].name ?? '')
+      console.debug(track.name)
+      console.debug(track.external_urls?.spotify)
+      console.debug(track.uri)
+
+      return Result.success(track.uri ?? '')
     }
-    const track = searchResult.val[0]
-
-    console.debug(track.artists?.[0].name ?? '')
-    console.debug(track.name)
-    console.debug(track.external_urls?.spotify)
-    console.debug(track.uri)
-
-    return Ok(track.uri ?? '')
-  })
+  )
 
   const result = await Promise.all(tracks)
 
   const [uris, errors] = result.reduce<[string[], Error[]]>(
-    ([uris, errors], result) => {
-      return result.err
-        ? [uris, [...errors, result.val]]
-        : [[...uris, result.val], errors]
+    (previousValue, currentValue) => {
+      const [uris, errors] = previousValue
+      return currentValue.isFailure
+        ? [uris, [...errors, currentValue.error]]
+        : [[...uris, currentValue.value], errors]
     },
     [[], []]
   )
@@ -65,12 +72,15 @@ const sleep = (ms: number) =>
     }, ms)
   })
 
-const createPlaylist = async (client: SpotifyClient, playlistName: string) => {
+const createPlaylist = async (
+  client: SpotifyClient,
+  playlistName: string
+): Promise<Result<string | undefined, Error>> => {
   const createResult = await client.createPlaylist(playlistName)
-  if (createResult.err) {
+  if (createResult.isFailure) {
     return createResult
   }
-  return Ok(createResult.val.id)
+  return Result.success(createResult.value.id)
 }
 
 const getPlaylist = async (
@@ -79,20 +89,20 @@ const getPlaylist = async (
   offset = 0
 ): Promise<Result<SimplifiedPlaylistObject | undefined, Error>> => {
   const playlistsResult = await client.getUserPlaylists(offset)
-  if (playlistsResult.err) {
+  if (playlistsResult.isFailure) {
     return playlistsResult
   }
 
-  const playlists = playlistsResult.val
+  const playlists = playlistsResult.value
   const playlist: SimplifiedPlaylistObject | undefined = playlists.items?.find(
     (item) => item.name === playlistName
   )
   if (playlist) {
-    return Ok(playlist)
+    return Result.success(playlist)
   }
 
   return !playlists.next
-    ? Ok(undefined)
+    ? Result.success(undefined)
     : getPlaylist(client, playlistName, offset + 50)
 }
 
@@ -107,25 +117,26 @@ const getPlaylistTrackUris = async (
     50
   )
 
-  if (playlistTracksResult.err) {
+  if (playlistTracksResult.isFailure) {
     return playlistTracksResult
   }
 
   const tracks =
-    playlistTracksResult.val?.items?.map((item) => item.track?.uri ?? '') ?? []
+    playlistTracksResult.value?.items?.map((item) => item.track?.uri ?? '') ??
+    []
 
-  const nextResult = !playlistTracksResult.val?.next
-    ? Ok([])
+  const nextResult = !playlistTracksResult.value?.next
+    ? Result.success([])
     : await getPlaylistTrackUris(client, playlistId, offset + 50)
 
-  if (nextResult.err) {
+  if (nextResult.isFailure) {
     return nextResult
   }
 
-  const nextTracks = nextResult.val ?? []
+  const nextTracks = nextResult.value ?? []
   const playlistTrackUris = [...tracks, ...nextTracks]
 
-  return Ok(playlistTrackUris)
+  return Result.success(playlistTrackUris)
 }
 
 const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
@@ -133,33 +144,33 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
   const jWavePlaylistName = `J-WAVE On Air ${today}`
 
   const playlistResult = await getPlaylist(client, jWavePlaylistName)
-  if (playlistResult.err) {
+  if (playlistResult.isFailure) {
     return playlistResult
   }
-  console.log(playlistResult.val)
+  console.log(playlistResult.value)
 
-  const playlistIdResult = playlistResult.val
-    ? Ok(playlistResult.val.id)
+  const playlistIdResult = playlistResult.value
+    ? Result.success(playlistResult.value.id)
     : await createPlaylist(client, jWavePlaylistName)
 
-  if (playlistIdResult.err) {
+  if (playlistIdResult.isFailure) {
     return playlistIdResult
   }
 
   const playlistTrackUrisResult = await getPlaylistTrackUris(
     client,
-    playlistIdResult.val ?? ''
+    playlistIdResult.value ?? ''
   )
 
-  if (playlistTrackUrisResult.err) {
+  if (playlistTrackUrisResult.isFailure) {
     return playlistTrackUrisResult
   }
 
   const filterTrackUris = trackUris.filter(
-    (uri) => !playlistTrackUrisResult.val?.includes(uri) && uri !== ''
+    (uri) => !playlistTrackUrisResult.value?.includes(uri) && uri !== ''
   )
 
-  await client.addItemsToPlaylist(playlistIdResult.val ?? '', filterTrackUris)
+  await client.addItemsToPlaylist(playlistIdResult.value ?? '', filterTrackUris)
 
   return playlistIdResult
 }
@@ -186,12 +197,12 @@ const main = async () => {
   console.log('uris.length: ', trackUris.length)
   const createPlaylistResult = await savePlaylist(client, trackUris)
 
-  if (createPlaylistResult.err) {
-    console.error(createPlaylistResult.val.message)
+  if (createPlaylistResult.isFailure) {
+    console.error(createPlaylistResult.error.message)
     process.exit(1)
   }
 
-  console.log(createPlaylistResult.val)
+  console.log(createPlaylistResult.value)
   process.exit()
 }
 

@@ -13,7 +13,7 @@ import {
   PrivateUserObject,
   TrackObject,
 } from '../../spotify/@types'
-import { Err, Ok, Result } from 'ts-results'
+import { Result } from 'result-type-ts'
 import * as process from 'process'
 
 const userId = process.env.SPOTIFY_USER_ID ?? ''
@@ -27,8 +27,8 @@ export const spotify = (accessToken: string) => {
 
   const getResult = <T>(callback: () => Promise<T>) =>
     callback()
-      .then((data) => Ok(data))
-      .catch((e) => Err(e))
+      .then((data) => Result.success(data))
+      .catch((e) => Result.failure(e))
 
   const partialMatch = (artistName: string, artist: string) => {
     const matchLength = Math.round(artist.length * 0.8)
