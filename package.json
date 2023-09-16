@@ -26,8 +26,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "playwright-core": "^1.35.1",
-    "result-type-ts": "^2.1.1",
-    "ts-results": "^3.3.0"
+    "result-type-ts": "^2.1.1"
   },
   "scripts": {
     "repl": "npx ts-node",

@@ -6,7 +6,6 @@ import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 import { SimplifiedPlaylistObject } from '../spotify/@types'
 import { Result } from 'result-type-ts'
-// import { Err, Ok, Result } from 'ts-results'
 
 type SpotifyClient = ReturnType<typeof spotify>
 
