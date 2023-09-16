@@ -175,21 +175,20 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
 
 const main = async () => {
   const authResult = await authorize()
-
   await authResult.match(
     async (auth) => {
-      console.debug('auth_token: ', auth?.access_token)
+      console.debug(`auth_token: ${auth.access_token}`)
 
       const client = spotify(auth?.access_token ?? '')
       const songs = await getOnAirList()
       const trackUris = await searchTracks(client, songs.slice(0, 100))
 
       if (trackUris.length === 0) {
-        console.log('no tracks')
+        console.debug('no tracks')
         return
       }
 
-      console.log('uris.length: ', trackUris.length)
+      console.debug(`uris.length: ${trackUris.length}`)
 
       const saveResult = await savePlaylist(client, trackUris)
       saveResult.match(
