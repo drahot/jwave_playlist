@@ -109,32 +109,20 @@ const getPlaylistTrackUris = async (
   playlistId: string,
   offset = 0
 ): Promise<Result<string[], Error>> => {
-  const playlistTracksResult = await client.getPlaylistTracks(
-    playlistId,
-    offset,
-    50
+  const result = await client.getPlaylistTracks(playlistId, offset, 50)
+
+  return result.match(
+    async (value) => {
+      const tracks = value?.items?.map((item) => item.track?.uri ?? '') ?? []
+
+      const result = !value?.next
+        ? Result.success([])
+        : await getPlaylistTrackUris(client, playlistId, offset + 50)
+
+      return result.map((nextTracks) => [...tracks, ...nextTracks])
+    },
+    (error) => Result.failure(error)
   )
-
-  if (playlistTracksResult.isFailure) {
-    return playlistTracksResult
-  }
-
-  const tracks =
-    playlistTracksResult.value?.items?.map((item) => item.track?.uri ?? '') ??
-    []
-
-  const nextResult = !playlistTracksResult.value?.next
-    ? Result.success([])
-    : await getPlaylistTrackUris(client, playlistId, offset + 50)
-
-  if (nextResult.isFailure) {
-    return nextResult
-  }
-
-  const nextTracks = nextResult.value ?? []
-  const playlistTrackUris = [...tracks, ...nextTracks]
-
-  return Result.success(playlistTrackUris)
 }
 
 const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
