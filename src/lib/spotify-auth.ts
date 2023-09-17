@@ -8,7 +8,7 @@ import { AuthResult } from '../../spotify-auth/api/token'
 import * as querystring from 'querystring'
 import { chromium } from 'playwright-core'
 import env from 'dotenv'
-import { Err, Ok, Result } from 'ts-results'
+import { Result } from 'result-type-ts'
 
 env.config()
 
@@ -126,9 +126,9 @@ const token = async (
         },
       },
     })
-    return Ok(body)
+    return Result.success(body)
   } catch (e) {
-    return Err(e as Error)
+    return Result.failure(e as Error)
   }
 }
 
@@ -165,7 +165,7 @@ export const authorize = async (): Promise<Result<AuthResult, Error>> => {
     return await token(code, AUTH_REDIRECT_URL)
   } catch (e) {
     console.log(e)
-    return Err(e as Error)
+    return Result.failure(e as Error)
   } finally {
     server.close()
   }
