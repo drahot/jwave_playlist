@@ -170,19 +170,18 @@ const main = async () => {
 
       if (trackUris.length === 0) {
         console.debug('no tracks')
-        return
+      } else {
+        console.debug(`uris.length: ${trackUris.length}`)
+        const result = await savePlaylist(client, trackUris)
+        result.match(
+          (value) => {
+            console.log(value)
+          },
+          (error) => {
+            console.error(error.message)
+          }
+        )
       }
-
-      console.debug(`uris.length: ${trackUris.length}`)
-      const result = await savePlaylist(client, trackUris)
-      return result.match(
-        (value) => {
-          console.log(value)
-        },
-        (error) => {
-          console.error(error.message)
-        }
-      )
     },
     (error) => {
       console.error(error.message)
