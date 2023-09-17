@@ -122,8 +122,8 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
   if (playlistResult.isFailure) {
     return playlistResult
   }
-  console.log(playlistResult.value)
 
+  console.log(playlistResult.value)
   const playlistIdResult = playlistResult.value
     ? Result.success(playlistResult.value.id)
     : await createPlaylist(client, jWavePlaylistName)
