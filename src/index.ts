@@ -74,11 +74,8 @@ const createPlaylist = async (
   client: SpotifyClient,
   playlistName: string
 ): Promise<Result<string | undefined, Error>> => {
-  const createResult = await client.createPlaylist(playlistName)
-  if (createResult.isFailure) {
-    return createResult
-  }
-  return Result.success(createResult.value.id)
+  const result = await client.createPlaylist(playlistName)
+  return result.map((value) => value.id)
 }
 
 const getPlaylist = async (
@@ -162,8 +159,8 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
 }
 
 const main = async () => {
-  const authResult = await authorize()
-  await authResult.match(
+  const result = await authorize()
+  await result.match(
     async (auth) => {
       console.debug(`auth_token: ${auth.access_token}`)
 
@@ -177,9 +174,8 @@ const main = async () => {
       }
 
       console.debug(`uris.length: ${trackUris.length}`)
-
-      const saveResult = await savePlaylist(client, trackUris)
-      saveResult.match(
+      const result = await savePlaylist(client, trackUris)
+      return result.match(
         (value) => {
           console.log(value)
         },
