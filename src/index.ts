@@ -16,31 +16,25 @@ const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
         await sleep(30000)
       }
 
-      const searchResult = await client.searchTrack(
-        item.artistName,
-        item.songName
-      )
+      const result = await client.searchTrack(item.artistName, item.songName)
+      return result.flatMap((tracks) => {
+        if (tracks.length > 0) {
+          const track = tracks[0]
 
-      if (searchResult.isFailure) {
-        return searchResult
-      }
+          console.debug(track.artists?.[0].name ?? '')
+          console.debug(track.name)
+          console.debug(track.external_urls?.spotify)
+          console.debug(track.uri)
 
-      const tracks = searchResult.value
-      if (tracks.length === 0) {
-        return Result.failure(
-          new Error(
-            `artist: ${item.artistName} song: ${item.songName}, no data`
+          return Result.success(track.uri ?? '')
+        } else {
+          return Result.failure(
+            new Error(
+              `artist: ${item.artistName} song: ${item.songName}, no data`
+            )
           )
-        )
-      }
-      const track = tracks[0]
-
-      console.debug(track.artists?.[0].name ?? '')
-      console.debug(track.name)
-      console.debug(track.external_urls?.spotify)
-      console.debug(track.uri)
-
-      return Result.success(track.uri ?? '')
+        }
+      })
     }
   )
 
@@ -83,22 +77,20 @@ const getPlaylist = async (
   playlistName: string,
   offset = 0
 ): Promise<Result<SimplifiedPlaylistObject | undefined, Error>> => {
-  const playlistsResult = await client.getUserPlaylists(offset)
-  if (playlistsResult.isFailure) {
-    return playlistsResult
-  }
-
-  const playlists = playlistsResult.value
-  const playlist: SimplifiedPlaylistObject | undefined = playlists.items?.find(
-    (item) => item.name === playlistName
+  const result = await client.getUserPlaylists(offset)
+  return await result.match(
+    async (value) => {
+      const playlist = value.items?.find((item) => item.name === playlistName)
+      if (playlist) {
+        return Result.success(playlist)
+      } else {
+        return !value.next
+          ? Result.success(undefined)
+          : await getPlaylist(client, playlistName, offset + 50)
+      }
+    },
+    (error) => Result.failure(error)
   )
-  if (playlist) {
-    return Result.success(playlist)
-  }
-
-  return !playlists.next
-    ? Result.success(undefined)
-    : getPlaylist(client, playlistName, offset + 50)
 }
 
 const getPlaylistTrackUris = async (
