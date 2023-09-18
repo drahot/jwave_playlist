@@ -114,40 +114,53 @@ const getPlaylistTrackUris = async (
   )
 }
 
+const getOrCreatePlaylist = async (
+  client: SpotifyClient,
+  playlistName: string
+): Promise<Result<string, Error>> => {
+  const listResult = await getPlaylist(client, playlistName)
+  return await listResult.match(
+    async (playlist) => {
+      const idResult = playlist
+        ? Result.success(playlist.id)
+        : await createPlaylist(client, playlistName)
+
+      return idResult.flatMap((id) => {
+        if (!id) {
+          return Result.failure(new Error('playlistId is undefined'))
+        }
+        return Result.success(id ?? '')
+      })
+    },
+    (error) => Result.failure(error)
+  )
+}
+
+const filterTrackUris = async (
+  client: SpotifyClient,
+  playlistId: string,
+  trackUris: string[]
+) =>
+  (await getPlaylistTrackUris(client, playlistId)).map((uris) =>
+    trackUris.filter((uri) => !uris.includes(uri) && uri !== '')
+  )
+
 const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
   const today = dayjs().format('YYYY-MM-DD')
   const jWavePlaylistName = `J-WAVE On Air ${today}`
 
-  const playlistResult = await getPlaylist(client, jWavePlaylistName)
-  if (playlistResult.isFailure) {
-    return playlistResult
-  }
-  console.log(playlistResult.value)
-
-  const playlistIdResult = playlistResult.value
-    ? Result.success(playlistResult.value.id)
-    : await createPlaylist(client, jWavePlaylistName)
-
-  if (playlistIdResult.isFailure) {
-    return playlistIdResult
-  }
-
-  const playlistTrackUrisResult = await getPlaylistTrackUris(
-    client,
-    playlistIdResult.value ?? ''
+  const idResult = await getOrCreatePlaylist(client, jWavePlaylistName)
+  return idResult.match(
+    async (id) => {
+      const urisResult = await filterTrackUris(client, id, trackUris)
+      return urisResult.match(
+        async (uris) =>
+          (await client.addItemsToPlaylist(id, uris)).map(() => id),
+        (error) => Result.failure(error)
+      )
+    },
+    (error) => Result.failure(error)
   )
-
-  if (playlistTrackUrisResult.isFailure) {
-    return playlistTrackUrisResult
-  }
-
-  const filterTrackUris = trackUris.filter(
-    (uri) => !playlistTrackUrisResult.value?.includes(uri) && uri !== ''
-  )
-
-  await client.addItemsToPlaylist(playlistIdResult.value ?? '', filterTrackUris)
-
-  return playlistIdResult
 }
 
 const main = async () => {
