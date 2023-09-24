@@ -1,6 +1,6 @@
 // noinspection JSUnresolvedReference
 
-import aspida from '@aspida/axios'
+import aspida from '@aspida/fetch'
 import * as searchApi from '../../spotify/search/$api'
 import * as usersApi from '../../spotify/users/$api'
 import * as playlistsApi from '../../spotify/playlists/$api'
