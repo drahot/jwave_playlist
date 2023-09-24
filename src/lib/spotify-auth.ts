@@ -1,7 +1,7 @@
 // noinspection JSUnresolvedReference
 
 import api from '../../spotify-auth/$api'
-import aspida from '@aspida/axios'
+import aspida from '@aspida/fetch'
 import express, { Express } from 'express'
 import http from 'http'
 import { AuthResult } from '../../spotify-auth/api/token'
