@@ -72,20 +72,19 @@ export const spotify = (accessToken: string) => {
           if ((item.album?.artists.length ?? 0) === 0) {
             return false
           }
-
-          const artistName = item.album?.artists[0].name?.toLowerCase() ?? ''
           const a = artist.toLowerCase()
-          if (artistName !== a) {
+
+          for (const artist of item.album?.artists ?? []) {
+            const artistName = artist.name?.toLowerCase() ?? ''
             if (
-              // 80% of artist name should match
-              !partialMatch(artistName, a) &&
-              !splitMatch(artistName, a)
+              artistName === a ||
+              partialMatch(artistName, a) ||
+              splitMatch(artistName, a)
             ) {
-              return false
+              return song.toLowerCase() === item.name?.toLowerCase()
             }
           }
-
-          return song.toLowerCase() === item.name?.toLowerCase()
+          return false
         })
       }),
     // プレイリストを作成する
