@@ -37,7 +37,7 @@ export const spotify = (accessToken: string) => {
   }
 
   const splitMatch = (artistName: string, artist: string) => {
-    const splitString = ['/', 'feat', 'with', '&', 'and']
+    const splitString = ['/', 'feat.', 'with', '&', 'and']
     for (const str of splitString) {
       if (artist.includes(str)) {
         const [name] = artist.split(str)
@@ -75,12 +75,13 @@ export const spotify = (accessToken: string) => {
 
           for (const artist of item.album?.artists ?? []) {
             const artistName = artist.name?.toLowerCase() ?? ''
+
             if (
               artistName === target ||
               partialMatch(artistName, target) ||
               splitMatch(artistName, target)
             ) {
-              return song.toLowerCase() === item.name?.toLowerCase()
+              return item.name?.toLowerCase().startsWith(song.toLowerCase())
             }
           }
           return false

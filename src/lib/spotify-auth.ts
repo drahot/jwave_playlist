@@ -46,7 +46,7 @@ const loginPage = async () => {
 
   const browser = await chromium.launch({
     channel: 'chrome',
-    headless: true,
+    headless: false,
   })
   const page = await browser.newPage()
   await page.goto(url)
