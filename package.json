@@ -29,8 +29,7 @@
   },
   "scripts": {
     "repl": "npx ts-node",
-    "build": "esbuild ./src/index.ts --outfile=./dist/index.js --bundle --minify --platform=node --target=node18",
-    "start": "node ./dist/index.js",
+    "start": "bun run ./src/index.ts",
     "api:build": "aspida"
   }
 }
