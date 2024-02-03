@@ -31,7 +31,7 @@
   "scripts": {
     "repl": "npx ts-node",
     "start": "bun run ./dist/index.js",
-    "build": "bun build ./src/index.ts --minify --outdir ./dist --target bun --minify",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
     "api:build": "aspida"
   }
 }
