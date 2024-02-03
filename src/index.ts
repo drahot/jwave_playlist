@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { authorize } from './lib/spotify-auth'
-import { getOnAirList, Song } from './lib/jwave'
+import { getOnAirList as getJwaveOnAirList, Song } from './lib/jwave'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 import { SimplifiedPlaylistObject } from '../spotify/@types'
 import { Result } from 'result-type-ts'
 
 type SpotifyClient = ReturnType<typeof spotify>
+const RadioStation = {
+  JWave: 'J-WAVE',
+  FM802: 'FM802',
+}
+
+type RadioStationType = (typeof RadioStation)[keyof typeof RadioStation]
 
 const searchTracks = async (client: SpotifyClient, songs: Song[]) => {
   const tracks: Promise<Result<string, Error>>[] = songs.map(
@@ -145,11 +151,15 @@ const filterTrackUris = async (
     trackUris.filter((uri) => !uris.includes(uri) && uri !== '')
   )
 
-const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
+const savePlaylist = async (
+  client: SpotifyClient,
+  playlistName: string,
+  trackUris: string[]
+) => {
   const today = dayjs().format('YYYY-MM-DD')
-  const jWavePlaylistName = `J-WAVE On Air ${today}`
+  const fullPlaylistName = `${playlistName} ${today}`
 
-  const idResult = await getOrCreatePlaylist(client, jWavePlaylistName)
+  const idResult = await getOrCreatePlaylist(client, fullPlaylistName)
   return idResult.match(
     async (id) => {
       const urisResult = await filterTrackUris(client, id, trackUris)
@@ -163,6 +173,30 @@ const savePlaylist = async (client: SpotifyClient, trackUris: string[]) => {
   )
 }
 
+const registerOnAirList = async (
+  client: SpotifyClient,
+  radioStation: RadioStationType,
+  songs: Song[]
+): Promise<void> => {
+  const trackUris = await searchTracks(client, songs.slice(0, 100))
+
+  if (trackUris.length === 0) {
+    console.debug('no tracks')
+  } else {
+    console.debug(`uris.length: ${trackUris.length}`)
+    const name = `${radioStation} On Air`
+    const result = await savePlaylist(client, name, trackUris)
+    result.match(
+      (value) => {
+        console.log(value)
+      },
+      (error) => {
+        console.error(error.message)
+      }
+    )
+  }
+}
+
 const main = async () => {
   const result = await authorize()
   await result.match(
@@ -170,23 +204,8 @@ const main = async () => {
       console.debug(`auth_token: ${auth.access_token}`)
 
       const client = spotify(auth?.access_token ?? '')
-      const songs = await getOnAirList()
-      const trackUris = await searchTracks(client, songs.slice(0, 100))
-
-      if (trackUris.length === 0) {
-        console.debug('no tracks')
-      } else {
-        console.debug(`uris.length: ${trackUris.length}`)
-        const result = await savePlaylist(client, trackUris)
-        result.match(
-          (value) => {
-            console.log(value)
-          },
-          (error) => {
-            console.error(error.message)
-          }
-        )
-      }
+      const songs = await getJwaveOnAirList()
+      await registerOnAirList(client, RadioStation.JWave, songs)
     },
     (error) => {
       console.error(error.message)
