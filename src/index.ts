@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { authorize } from './lib/spotify-auth'
-import { getOnAirList as getJwaveOnAirList, Song } from './lib/jwave'
+import { getOnAirList as getJwaveOnAirList } from './lib/jwave'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 import { SimplifiedPlaylistObject } from '../spotify/@types'
 import { Result } from 'result-type-ts'
+import { Song } from './lib/types'
 
 type SpotifyClient = ReturnType<typeof spotify>
 const RadioStation = {
