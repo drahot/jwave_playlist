@@ -5,7 +5,6 @@ const FM802_ON_AIR_URL = 'https://funky802.com/site/onairlist'
 
 export const getOnAirList = async (): Promise<Song[]> => {
   const { browser, page } = await getBrowser(FM802_ON_AIR_URL)
-
   try {
     return await page.evaluate(() => {
       const songInfos = document.querySelectorAll('.c-infoOnair__list')
