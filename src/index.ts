@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { authorize } from './lib/spotify-auth'
 import { getOnAirList as getJwaveOnAirList } from './lib/jwave'
+import { getOnAirList as getFM802OnAirList } from './lib/fm802'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 import { SimplifiedPlaylistObject } from '../spotify/@types'
@@ -205,8 +206,16 @@ const main = async () => {
       console.debug(`auth_token: ${auth.access_token}`)
 
       const client = spotify(auth?.access_token ?? '')
-      const songs = await getJwaveOnAirList()
-      await registerOnAirList(client, RadioStation.JWave, songs)
+      await registerOnAirList(
+        client,
+        RadioStation.JWave,
+        await getJwaveOnAirList()
+      )
+      await registerOnAirList(
+        client,
+        RadioStation.FM802,
+        await getFM802OnAirList()
+      )
     },
     (error) => {
       console.error(error.message)
