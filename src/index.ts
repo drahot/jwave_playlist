@@ -204,18 +204,14 @@ const main = async () => {
   await result.match(
     async (auth) => {
       console.debug(`auth_token: ${auth.access_token}`)
-
       const client = spotify(auth?.access_token ?? '')
-      await registerOnAirList(
-        client,
-        RadioStation.JWave,
-        await getJwaveOnAirList()
-      )
-      await registerOnAirList(
-        client,
-        RadioStation.FM802,
-        await getFM802OnAirList()
-      )
+      const rows = [
+        { radio: RadioStation.JWave, getOnAirList: getJwaveOnAirList },
+        { radio: RadioStation.FM802, getOnAirList: getFM802OnAirList },
+      ]
+      for (const row of rows) {
+        await registerOnAirList(client, row.radio, await row.getOnAirList())
+      }
     },
     (error) => {
       console.error(error.message)
