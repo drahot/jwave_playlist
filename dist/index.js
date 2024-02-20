@@ -33550,7 +33550,7 @@ var require_env = __commonJS((exports) => {
     return !!value && value !== "false" && value !== "0";
   };
   var getPackageManager = function() {
-    const env = "bun/1.0.25 npm/? node/v21.6.0 darwin arm64";
+    const env = "bun/1.0.27 npm/? node/v21.6.0 darwin arm64";
     if (env.includes("yarn"))
       return "yarn";
     if (env.includes("pnpm"))
@@ -84697,8 +84697,13 @@ var main = async () => {
   await result.match(async (auth) => {
     console.debug(`auth_token: ${auth.access_token}`);
     const client = spotify(auth?.access_token ?? "");
-    await registerOnAirList(client, RadioStation.JWave, await getOnAirList());
-    await registerOnAirList(client, RadioStation.FM802, await getOnAirList2());
+    const rows = [
+      { radio: RadioStation.JWave, getOnAirList },
+      { radio: RadioStation.FM802, getOnAirList: getOnAirList2 }
+    ];
+    for (const row of rows) {
+      await registerOnAirList(client, row.radio, await row.getOnAirList());
+    }
   }, (error) => {
     console.error(error.message);
   });
