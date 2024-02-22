@@ -28,9 +28,10 @@
     "result-type-ts": "^2.1.1"
   },
   "scripts": {
-    "repl": "npx ts-node",
-    "start": "bun run ./dist/index.js",
+    "repl": "bun repl",
+    "start": "./dist/radio_scraping",
     "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "native:build": "bun build ./src/index.ts --compile --outfile ./dist/radio_scraping;mv ./src/radio_scraping ./dist/radio_scraping",
     "api:build": "aspida"
   }
 }
