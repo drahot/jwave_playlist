@@ -7,7 +7,6 @@ export const scrapeSongs = async (
   artistSelector: string,
   songSelector: string
 ): Promise<Song[]> => {
-  // const { browser, page } = await getBrowser(url)
   const browser = await chromium.launch({
     channel: 'chrome',
     headless: true,
@@ -28,7 +27,6 @@ export const scrapeSongs = async (
           const songName = (
             songInfo.querySelector(songSelector)?.textContent ?? ''
           ).trim()
-
           return {
             songName,
             artistName,
