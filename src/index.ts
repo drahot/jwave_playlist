@@ -2,6 +2,7 @@
 import { authorize } from './lib/spotify-auth'
 import { getOnAirList as getJwaveOnAirList } from './lib/jwave'
 import { getOnAirList as getFM802OnAirList } from './lib/fm802'
+import { getOnAirList as getKISSFMOnAirList } from './lib/kissfm'
 import { spotify } from './lib/spotify'
 import dayjs from 'dayjs'
 import { SimplifiedPlaylistObject } from '../spotify/@types'
@@ -12,6 +13,7 @@ type SpotifyClient = ReturnType<typeof spotify>
 const RadioStation = {
   JWave: 'J-WAVE',
   FM802: 'FM802',
+  KISSFM: 'KISSFM',
 }
 
 type RadioStationType = (typeof RadioStation)[keyof typeof RadioStation]
@@ -208,6 +210,7 @@ const main = async () => {
       const rows = [
         { radio: RadioStation.JWave, getOnAirList: getJwaveOnAirList },
         { radio: RadioStation.FM802, getOnAirList: getFM802OnAirList },
+        { radio: RadioStation.KISSFM, getOnAirList: getKISSFMOnAirList },
       ]
       for (const row of rows) {
         await registerOnAirList(client, row.radio, await row.getOnAirList())

@@ -83937,6 +83937,12 @@ var getOnAirList2 = async () => {
   return await scrapeSongs(FM802_ON_AIR_URL, ".c-infoOnair__list", ".c-infoOnair__list--artist", ".c-infoOnair__list--title");
 };
 
+// src/lib/kissfm.ts
+var KISSFM_ON_AIR_URL = "https://noa.audee.jp/search/view/iv/";
+var getOnAirList3 = async () => {
+  return await scrapeSongs(KISSFM_ON_AIR_URL, ".entry", ".entryArtist", ".entryTxt > a");
+};
+
 // spotify/search/$api.ts
 var api2 = ({ baseURL, fetch: fetch3 }) => {
   const prefix = (baseURL === undefined ? "https://api.spotify.com/v1" : baseURL).replace(/\/$/, "");
@@ -84343,7 +84349,8 @@ var spotify = (accessToken) => {
 var import_dayjs = __toESM(require_dayjs_min(), 1);
 var RadioStation = {
   JWave: "J-WAVE",
-  FM802: "FM802"
+  FM802: "FM802",
+  KISSFM: "KISSFM"
 };
 var searchTracks = async (client, songs) => {
   const tracks = songs.map(async (item, i) => {
@@ -84446,7 +84453,8 @@ var main = async () => {
     const client = spotify(auth?.access_token ?? "");
     const rows = [
       { radio: RadioStation.JWave, getOnAirList },
-      { radio: RadioStation.FM802, getOnAirList: getOnAirList2 }
+      { radio: RadioStation.FM802, getOnAirList: getOnAirList2 },
+      { radio: RadioStation.KISSFM, getOnAirList: getOnAirList3 }
     ];
     for (const row of rows) {
       await registerOnAirList(client, row.radio, await row.getOnAirList());
