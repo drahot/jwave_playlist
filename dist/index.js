@@ -83942,6 +83942,12 @@ var getOnAirList3 = async () => {
   return await scrapeSongs(KISSFM_ON_AIR_URL, ".entry", ".entryArtist", ".entryTxt > a");
 };
 
+// src/lib/bayfm.ts
+var BAYFM_ON_AIR_URL = "https://www.bayfm.co.jp/onair/";
+var getOnAirList4 = async () => {
+  return await scrapeSongs(BAYFM_ON_AIR_URL, ".names", ".artist", ".title");
+};
+
 // spotify/search/$api.ts
 var api2 = ({ baseURL, fetch: fetch3 }) => {
   const prefix = (baseURL === undefined ? "https://api.spotify.com/v1" : baseURL).replace(/\/$/, "");
@@ -84349,7 +84355,8 @@ var import_dayjs = __toESM(require_dayjs_min(), 1);
 var RadioStation = {
   JWave: "J-WAVE",
   FM802: "FM802",
-  KISSFM: "KISSFM"
+  KissFM: "KISSFM",
+  BayFM: "BAYFM"
 };
 var searchTracks = async (client, songs) => {
   const tracks = songs.map(async (item, i) => {
@@ -84453,7 +84460,8 @@ var main = async () => {
     const rows = [
       { radio: RadioStation.JWave, getOnAirList },
       { radio: RadioStation.FM802, getOnAirList: getOnAirList2 },
-      { radio: RadioStation.KISSFM, getOnAirList: getOnAirList3 }
+      { radio: RadioStation.KissFM, getOnAirList: getOnAirList3 },
+      { radio: RadioStation.BayFM, getOnAirList: getOnAirList4 }
     ];
     for (const row of rows) {
       await registerOnAirList(client, row.radio, await row.getOnAirList());
