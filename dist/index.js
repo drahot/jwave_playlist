@@ -33636,7 +33636,7 @@ var require_env = __commonJS((exports) => {
     return !!value && value !== "false" && value !== "0";
   };
   var getPackageManager = function() {
-    const env = "bun/1.0.30 npm/? node/v21.6.0 darwin arm64";
+    const env = "bun/1.0.33 npm/? node/v21.6.0 darwin arm64";
     if (env.includes("yarn"))
       return "yarn";
     if (env.includes("pnpm"))
