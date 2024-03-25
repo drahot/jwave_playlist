@@ -22995,6 +22995,9 @@ var require_cookie = __commonJS((exports) => {
     if (opt.secure) {
       str += "; Secure";
     }
+    if (opt.partitioned) {
+      str += "; Partitioned";
+    }
     if (opt.priority) {
       var priority = typeof opt.priority === "string" ? opt.priority.toLowerCase() : opt.priority;
       switch (priority) {
@@ -23256,6 +23259,7 @@ var require_response = __commonJS((exports, module) => {
   var mime2 = send.mime;
   var resolve = path.resolve;
   var vary = require_vary();
+  var urlParse = import.meta.require("url").parse;
   var res = Object.create(http.ServerResponse.prototype);
   module.exports = res;
   var charsetRegExp = /;\s*charset\s*=/;
@@ -23612,11 +23616,24 @@ var require_response = __commonJS((exports, module) => {
     return this;
   };
   res.location = function location(url) {
-    var loc = url;
+    var loc = String(url);
     if (url === "back") {
       loc = this.req.get("Referrer") || "/";
     }
-    return this.set("Location", encodeUrl(loc));
+    var lowerLoc = loc.toLowerCase();
+    var encodedUrl = encodeUrl(loc);
+    if (lowerLoc.indexOf("https://") === 0 || lowerLoc.indexOf("http://") === 0) {
+      try {
+        var parsedUrl = urlParse(loc);
+        var parsedEncodedUrl = urlParse(encodedUrl);
+        if (parsedUrl.host !== parsedEncodedUrl.host) {
+          return this.set("Location", loc);
+        }
+      } catch (e) {
+        return this.set("Location", loc);
+      }
+    }
+    return this.set("Location", encodedUrl);
   };
   res.redirect = function redirect(url) {
     var address = url;
@@ -33636,7 +33653,7 @@ var require_env = __commonJS((exports) => {
     return !!value && value !== "false" && value !== "0";
   };
   var getPackageManager = function() {
-    const env = "bun/1.0.33 npm/? node/v21.6.0 darwin arm64";
+    const env = "bun/1.0.35 npm/? node/v21.6.0 darwin arm64";
     if (env.includes("yarn"))
       return "yarn";
     if (env.includes("pnpm"))
