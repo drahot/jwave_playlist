@@ -29,7 +29,7 @@
   },
   "scripts": {
     "repl": "bun repl",
-    "start": "./dist/radio_scraping",
+    "start": "bun run ./dist/index.js",
     "build": "bun build ./src/index.ts --outdir ./dist --target bun",
     "native:build": "bun build ./src/index.ts --compile --outfile ./dist/radio_scraping;mv ./src/radio_scraping ./dist/radio_scraping",
     "api:build": "aspida"
